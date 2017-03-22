@@ -41,6 +41,20 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         catch {
             throw "Could not find TraceEvent DLL at path: $path"
         }
+        # Verify assembly loaded
+        if (-Not ([appdomain]::currentdomain.getassemblies()).location -match $path) {
+            throw "Failed to load TraceEvent DLL"
+        }
+    }
+    PROCESS {
+        # Create our ETW Session options
+        $options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSessionOptions
+        # Create ETW session
+        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @("test", "C:\Users\tanium\Documents\GitHub\PSEventDetect\out4.etl",$options)
+        # Start session
+        $session.EnableProvider(@("Microsoft-Windows-WinRM"))
+        Start-Sleep -s 20
+        $session.stop
     }
 
 } # Start-ETWProvider
