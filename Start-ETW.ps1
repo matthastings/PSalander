@@ -24,7 +24,7 @@ Returns a boolean representing if
 
 Start-ETWProvider is a function that starts an ETW provider and will write output
 #>
-    [CmdletBinding()S]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Alias("Provider")]
