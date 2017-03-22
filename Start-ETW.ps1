@@ -35,7 +35,12 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
     BEGIN {
         # Load TraceEvent assembly
         $path = $PSScriptRoot + "\lib\Microsoft.Diagnostics.Tracing.TraceEvent.dll"
-        $path
+        try {
+            Add-Type -Path $path
+        }
+        catch {
+            throw "Could not find TraceEvent DLL at path: $path"
+        }
     }
 
 } # Start-ETWProvider
