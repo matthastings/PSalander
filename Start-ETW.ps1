@@ -42,7 +42,7 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
             throw "Could not find TraceEvent DLL at path: $path"
         }
         # Verify assembly loaded
-        if (-Not ([appdomain]::currentdomain.getassemblies()).location -match $path) {
+        if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
             throw "Failed to load TraceEvent DLL"
         }
     }
