@@ -14,6 +14,32 @@ Get-ETWProvider is a function that returns objects representing ETW provider met
 } # Get-ETWProvider
 
 
+function Start-ETWProvider {
+<#
+.SYNOPSIS
+
+Returns a boolean representing if 
+
+.DESCRIPTION
+
+Start-ETWProvider is a function that starts an ETW provider and will write output
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Alias("Provider")]
+        [string]
+        $ProviderName
+    )
+
+    BEGIN {
+        # Load TraceEvent assembly
+        $path = Split-Path $SCRIPT:MyInvocation.MyCommand.Path -parent
+        $path + "\lib\lib/Microsoft.Diagnostics.Tracing.TraceEvent.dll"
+    }
+
+} # Start-ETWProvider
+
 <#
 $LIB_LOCATION = ".\lib\Microsoft.Diagnostics.Tracing.TraceEvent.dll"
 
