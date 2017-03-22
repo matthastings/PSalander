@@ -24,7 +24,7 @@ Returns a boolean representing if
 
 Start-ETWProvider is a function that starts an ETW provider and will write output
 #>
-    [CmdletBinding()]
+    [CmdletBinding()S]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Alias("Provider")]
@@ -34,8 +34,8 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
 
     BEGIN {
         # Load TraceEvent assembly
-        $path = Split-Path $SCRIPT:MyInvocation.MyCommand.Path -parent
-        $path + "\lib\lib/Microsoft.Diagnostics.Tracing.TraceEvent.dll"
+        $path = $PSScriptRoot + "\lib\Microsoft.Diagnostics.Tracing.TraceEvent.dll"
+        $path
     }
 
 } # Start-ETWProvider
