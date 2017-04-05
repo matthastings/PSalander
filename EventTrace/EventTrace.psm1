@@ -62,7 +62,16 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Alias("Provider")]
         [string]
-        $ProviderName
+        $ProviderName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $SessionName,
+
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        $OutputFile
     )
 
     BEGIN {
@@ -74,12 +83,47 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
     PROCESS {
         # Create our ETW Session options
         $options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSessionOptions
+        $options.Create
         # Create ETW session
-        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @("test", "C:\Users\tanium\Documents\GitHub\PSEventDetect\out4.etl", $options)
+        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
         # Start session
-        $session.EnableProvider(@("Microsoft-Windows-PowerShell"))
-        Start-Sleep -s 20
-        $session.stop()
+        $session.EnableProvider(@($ProviderName))
+        $session.StopOnDispose = $false
     }
 
 } # Start-ETWProvider
+
+Function Stop-ETWSession {
+<#
+.SYNOPSIS
+
+Stops an ETW session
+
+.DESCRIPTION
+
+Stope-ETWSession is a function that stops an ETW session
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [string]
+        $SessionName
+    )
+
+    BEGIN {
+        # Verify assembly loaded
+        if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
+            throw "Failed to load TraceEvent DLL"
+        }
+    }
+    PROCESS {
+        # Create our ETW Session options
+        $options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSessionOptions
+        $options.Attach
+        # Create ETW session
+        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, "", $options)
+        # Stop session
+        $session.stop()
+    }
+
+} # Stop-ETWSession
