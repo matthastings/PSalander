@@ -74,7 +74,12 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         $OutputFile
     )
 
+
     BEGIN {
+        Write-Verbose "Session name set to $SessionName"
+        Write-Verbose "Provider set to $ProviderName"
+        $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
+        Write-Verbose "Setting output file to $path"
         # Verify assembly loaded
         if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
             throw "Failed to load TraceEvent DLL"
@@ -86,9 +91,18 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         $options.Create
         # Create ETW session
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
-        # Start session
-        $session.EnableProvider(@($ProviderName))
         $session.StopOnDispose = $false
+        # Start session
+        $result = $session.EnableProvider(@($ProviderName))
+        # EnableProvider returns false if session if not previously exist
+        If ($result -eq $False) {
+            "Started session $name"
+        } 
+        else {
+            "Failed to start session $name"
+        }
+        
+        
     }
 
 } # Start-ETWProvider
