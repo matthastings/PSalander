@@ -111,11 +111,11 @@ Function Stop-ETWSession {
 <#
 .SYNOPSIS
 
-Stops an ETW session
+Stop an ETW session
 
 .DESCRIPTION
 
-Stope-ETWSession is a function that stops an ETW session
+Stop-ETWSession is a function that attaches to and stops an existing ETW session
 #>
     [CmdletBinding()]
     param(
