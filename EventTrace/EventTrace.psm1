@@ -11,6 +11,55 @@ if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) 
     throw "Failed to load TraceEvent DLL"
 }
 
+Function ConvertTo-ETWGuid {
+<#
+.SYNOPSIS
+
+Returns a provider GUID given
+
+.DESCRIPTION
+
+ConvertTo-ETWGuid is a function that returns the ETW GUID for a given provider. This functions requires the provider name as an input argument.
+#>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Alias("Provider")]
+        [string]
+        $ProviderName)
+
+     $ProviderGuid = [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderGuidByName($ProviderName)
+     If ($ProviderGuid -eq [System.Guid]::Empty) {
+         throw "$ProviderName either does not exist or has empty GUID"
+     }
+     else {$ProviderGuid}
+
+} # ConvertTo-ETWGuid
+
+Function Get-ProviderKeywords {
+<#
+.SYNOPSIS
+
+Returns provider keywords
+
+.DESCRIPTION
+
+Get-ProviderKeywords is a function that returns a provider's keywords. This function accepts an input of either a provider name or provider GUID.
+#>
+
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        $Provider)
+
+        If ($Provider -is [string]) {
+            $Provider = ConvertTo-ETWGuid($Provider)
+        }
+
+        [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderKeywords($Provider)
+
+} # Get-ProviderKeywords
+
 Function Get-ETWProvider {
 <#
 .SYNOPSIS
@@ -68,10 +117,13 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         [string]
         $SessionName,
 
-        
         [Parameter(Mandatory=$true)]
         [string]
-        $OutputFile
+        $OutputFile,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateScript({$_ | ForEach-Object {$_ -is [Microsoft.Diagnostics.Tracing.Session.ProviderDataItem]} })]
+        $Keywords
     )
 
 
@@ -91,10 +143,24 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         $options.Create
         # Create ETW session
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
+        # Setting StopOnDispose to false will not end a session if powershell ends
         $session.StopOnDispose = $false
+        
+        # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
+        # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
+        If ($Keywords) {
+           $MatchAnyKeywords = $Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
+        } else {
+            $MatchAnyKeywords = [uint64]::MaxValue
+        }
+
+        # Set log level. Default, and only supported option at this time, is Verbose
+
+        $TraceEventLevel = 5 # Verbose 
         # Start session
         $ProviderName | ForEach-Object {
-            $result = $session.EnableProvider(@($_))
+             $result = $session.EnableProvider($_, $TraceEventLevel, $MatchAnyKeywords, $null)
+
         }
         # EnableProvider returns false if session if not previously exist
         If ($result -eq $False) {
