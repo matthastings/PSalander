@@ -61,7 +61,7 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Alias("Provider")]
-        [string]
+        [array]
         $ProviderName,
 
         [Parameter(Mandatory=$true)]
@@ -93,13 +93,15 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
         $session.StopOnDispose = $false
         # Start session
-        $result = $session.EnableProvider(@($ProviderName))
+        $ProviderName | ForEach-Object {
+            $result = $session.EnableProvider(@($_))
+        }
         # EnableProvider returns false if session if not previously exist
         If ($result -eq $False) {
-            "Started session $name"
+            "Started session $SessionName"
         } 
         else {
-            "Failed to start session $name"
+            "Failed to start session $SessionName"
         }
         
         
