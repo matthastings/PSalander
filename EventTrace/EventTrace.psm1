@@ -1,7 +1,7 @@
 # Setup initial assembly import
 $path = $PSScriptRoot + "\lib\Microsoft.Diagnostics.Tracing.TraceEvent.dll"
 try {
-    Add-Type -Path $path
+    Import-Module -Path $path
 }
 catch {
     throw "Could not find TraceEvent DLL at path: $path"
