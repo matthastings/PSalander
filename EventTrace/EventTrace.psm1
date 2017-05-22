@@ -87,9 +87,11 @@ Returns an array of active ETW session GetProviderNames
 Get-ETWSession is a function that returns active ETW sessions
 
 #>
-    $ActiveSessionNames = [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
+    function Get-SessionNames {
+        [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
+    }
     try {
-        $ActiveSessionNames | ForEach-Object {
+        Get-SessionNames | ForEach-Object {
             [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSession($_)
         }
     } 
