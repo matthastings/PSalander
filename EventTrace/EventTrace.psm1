@@ -1,7 +1,7 @@
 # Setup initial assembly import
 $path = $PSScriptRoot + "\lib\Microsoft.Diagnostics.Tracing.TraceEvent.dll"
 try {
-    Import-Module -Path $path
+    Import-Module $path
 }
 catch {
     throw "Could not find TraceEvent DLL at path: $path"
@@ -70,8 +70,9 @@ Returns a ProviderMetadata object for each enabled ETW provider.
 
 Get-ETWProvider is a function that returns objects representing ETW provider metadata
 #>
-    ForEach ($Name in [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.GetProviderNames()) {
-        try { [System.Diagnostics.Eventing.Reader.ProviderMetadata]($name) } catch {}
+
+    [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.GetProviderNames() | ForEach-Object {
+        try { [System.Diagnostics.Eventing.Reader.ProviderMetadata]($_) } catch {}
     }
 } # Get-ETWProvider
 
@@ -88,7 +89,9 @@ Get-ETWSession is a function that returns active ETW sessions
 #>
 
     try {
-        [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
+        [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames() | ForEach-Object {
+            New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($_)
+        }
     } 
     catch {
         "Failed to list active sessions"
