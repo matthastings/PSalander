@@ -11,6 +11,20 @@ if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) 
     throw "Failed to load TraceEvent DLL"
 }
 
+# Private functions
+Function Get-SessionNames {
+    #  Generates list of ETW session names [string]
+     [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
+}
+
+Function Test-IsSession($SessionName) {
+
+    (Get-SessionNames).Contains($SessionName)
+
+} # Test-IsSession
+
+# End private functions
+
 Function ConvertTo-ETWGuid {
 <#
 .SYNOPSIS
@@ -87,21 +101,18 @@ Returns an array of active ETW session GetProviderNames
 Get-ETWSession is a function that returns active ETW sessions
 
 #>
-    function Get-SessionNames {
-        [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
-    }
     try {
         Get-SessionNames | ForEach-Object {
             [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSession($_)
         }
     } 
     catch {
-        "Failed to list active sessions"
+        throw "Failed to list active sessions"
     }
 
 } # Get-ETWSession
 
-Function Start-ETWProvider {
+Function Start-ETWSession {
 <#
 .SYNOPSIS
 
@@ -133,14 +144,14 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
 
 
     BEGIN {
+
+        If ( (Test-IsSession -SessionName $SessionName) ) {
+            throw "$SessionName already exists. Cannot create again"
+        }
         Write-Verbose "Session name set to $SessionName"
         Write-Verbose "Provider set to $ProviderName"
         $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
         Write-Verbose "Setting output file to $path"
-        # Verify assembly loaded
-        if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
-            throw "Failed to load TraceEvent DLL"
-        }
     }
     PROCESS {
         # Create our ETW Session options
@@ -178,7 +189,7 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         
     }
 
-} # Start-ETWProvider
+} # Start-ETWSession
 
 Function Stop-ETWSession {
 <#
@@ -198,9 +209,8 @@ Stop-ETWSession is a function that attaches to and stops an existing ETW session
     )
 
     BEGIN {
-        # Verify assembly loaded
-        if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
-            throw "Failed to load TraceEvent DLL"
+        if ( -Not (Test-IsSession -SessionName $SessionName ) ) {
+            throw "$SessionName is not a valid session"
         }
     }
     PROCESS {
