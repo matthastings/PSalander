@@ -1,4 +1,4 @@
-# PSEventDetect
+# PSalander
 
 ## Useful links
 https://github.com/Microsoft/dotnetsamples/blob/master/Microsoft.Diagnostics.Tracing/TraceEvent/docs/TraceEvent.md
@@ -10,8 +10,8 @@ https://github.com/Microsoft/perfview/blob/master/src/TraceEvent/TraceEventSessi
 Uses the Microsoft TraceEvent Library from https://www.nuget.org/packages/Microsoft.Diagnostics.Tracing.TraceEvent/ for ETW functions
 
 
-## Notes / Todos
+## Referenced Work
 
-* Doesn’t look like you can call multiple providers in a single session $result = $session.EnableProvider(@("Microsoft-Windows-PowerShell”, “ANOTHER SESSION NAME” )) does not work
-* Need to look at enable provider options for custom provider configuration
-* if there is time explore on demand event consumer 
+Design for PSalander was heavily influenced by [CimSweep](https://github.com/PowerShellMafia/CimSweep). It should be the model all PS modules follow. 
+
+ 
