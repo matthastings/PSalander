@@ -11,15 +11,10 @@ if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) 
     throw "Failed to load TraceEvent DLL"
 }
 
-# Private functions
-Function Get-SessionNames {
-    #  Generates list of ETW session names [string]
-     [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
-}
-
+# Start Private Functions
 Function Test-IsSession($SessionName) {
 
-    (Get-SessionNames).Contains($SessionName)
+    (Get-ETWSessionNames).Contains($SessionName)
 
 } # Test-IsSession
 
@@ -90,7 +85,23 @@ Get-ETWProvider is a function that returns objects representing ETW provider met
     }
 } # Get-ETWProvider
 
-Function Get-ETWSession {
+Function Get-ETWSessionNames {
+<#
+.SYNOPSIS
+Generates list of ETW session names 
+
+.DESCRIPTION
+Get-ETWSessionNames is a function that enumerates active ETW sessions and return their names in an array.
+
+.EXAMPLE
+Get-ETWSessionNames
+
+#>
+     [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
+}
+
+
+Function Get-ETWSessionDetails {
 <#
 .SYNOPSIS
 
@@ -98,16 +109,25 @@ Returns an array of active ETW session GetProviderNames
 
 .DESCRIPTION
 
-Get-ETWSession is a function that returns active ETW sessions
+Get-ETWSessionDetails is a function that returns a TraceEventSession object for a given session name
 
 #>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [string]
+        $SessionName
+    )
+    # Verify session exists
+    If ( -Not (Test-IsSession -SessionName $SessionName) ) {
+        throw "Session does not exist"
+    }
     try {
-        Get-SessionNames | ForEach-Object {
-            [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSession($_)
+            [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSession($SessionName)
         }
-    } 
     catch {
-        throw "Failed to list active sessions"
+        throw "Failed to get session details"
     }
 
 } # Get-ETWSession

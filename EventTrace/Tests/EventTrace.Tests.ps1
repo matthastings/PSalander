@@ -68,28 +68,35 @@ Describe 'Get-ETWProvider' {
     }
 }
 
-Describe 'Get-ETWSession' {
-    InModuleScope EventTrace{
-        Context 'output validation' {
-            It 'Should generate output' {
-                { Get-ETWSession } | Should Not BeNullOrEmpty
-            }
-
-            It 'Should return properly formatted TraceEventSession objects' {
-                $Result = Get-ETWSession
-
-                $Result[0].PSObject.TypeNames[0] | Should be `
-                    'Microsoft.Diagnostics.Tracing.Session.TraceEventSession'
-            }
-
-            It 'Should generate an erorr when no session names found' {
-                Mock Get-SessionNames {return $null}
-                
-                { Get-ETWSession } | Should Throw
-            }
+Describe 'Get-ETWSessionNames' {
+    Context 'output validation' {
+        It 'Should generate output' {
+            { Get-ETWSessionNames } | Should Not BeNullOrEmpty
         }
     }
 }
+
+Describe 'Get-ETWSessionDetails' {
+    Context 'input validation' {
+        It 'Should require input' {
+            { Get-ETWSessionDetails -SessionName } | Should Throw
+        }
+
+        It 'Should error when invalid name provided' {
+            { Get-ETWSessionDetails -SessionName "not valid" } | Should Throw "Session does not exist"
+        }
+    }
+
+    Context 'output validation' {
+        It 'Should return TraceEventSessionObject' {
+            $SessionName = (Get-ETWSessionNames)[0]
+            
+            $Result = Get-ETWSessionDetails -SessionName $SessionName
+            $Result[0].PSObject.TypeNames[0] | Should be 'Microsoft.Diagnostics.Tracing.Session.TraceEventSession'
+        }
+    }
+}
+
 
 Describe 'Start-ETWSession' {
     Context 'input validation' {
