@@ -10,6 +10,19 @@ $ProviderName = "Microsoft-Windows-Kernel-Process"
 
 Import-Module $Module -Force -ErrorAction Stop
 
+Describe 'New-ETWSessionConfig' {
+    Context 'output validation' {
+        It 'Should return PS object' {
+            { (New-ETWSessionConfig).PSObject.TypeNames[1] } | Should Be 'System.Object' 
+        }
+        It 'Should contain 3 properties' {
+            { New-ETWSessionConfig | Get-Member | Where-Object {
+                $_.MemberType -eq 'NoteProperty' | Measure-Object | Select-Object count
+            } } | Should be 3
+        }
+    }
+}
+
 Describe 'ConvertTo-ETWGuid' {
     Context 'input validation' {
         It 'Should should accept string input' {
@@ -102,21 +115,20 @@ Describe 'Start-ETWSession' {
     Context 'input validation' {
         $SName = "TestSession"
         $OFile = ".\Output.etl"
-        $PName = @("Microsoft-Windows-Kernel-Process")
         $Key = @("not the right type")
 
         It 'Should generate errors when required params are not provided' {
-            { Start-ETWProvider -ProviderName -SessionName -OutputFile } | Should Throw 
+            { Start-ETWProvider  -SessionConfig -SessionName -OutputFile } | Should Throw 
         }
         It "Should require ProviderDataItem objects in keyword param"{
-            { Start-ETWProvider -ProviderName $PName -Keywords $Key-OutputFile $OFile -SessionName $SName }`
+            { Start-ETWProvider -ProviderConfig $null -Keywords $Key-OutputFile $OFile -SessionName $SName }`
                 | Should Throw
         }
         InModuleScope EventTrace{
             It 'Should fail to run if session already exists' {
                 Mock Test-IsSession {return $true}
 
-                { Start-ETWProvider -ProviderName $PName -OutputFile $OFile -SessionName $SName } `
+                { Start-ETWProvider -ProviderConfig $null -OutputFile $OFile -SessionName $SName } `
                     | Should Throw
 
             }

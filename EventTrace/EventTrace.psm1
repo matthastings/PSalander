@@ -12,13 +12,45 @@ if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) 
 }
 
 # Start Private Functions
-Function Test-IsSession($SessionName) {
+Function Test-IsSession
+{
+    Param($SessionName)
 
     (Get-ETWSessionNames).Contains($SessionName)
 
 } # Test-IsSession
 
 # End private functions
+
+Function New-ETWProviderConfig
+{
+    <#
+    .SYNOPSIS
+
+    Initialzates new ETW session object
+
+    .DESCRIPTION
+
+    New-ETWProviderConfig is a function that initializations and returns a new ETWProviderConfig object. The object is made of three properties: Name, Guid, and Keywords.
+
+    .EXAMPLE
+
+    $ProviderConfig = New-ETWProviderConfig
+
+    #>
+
+    $Config = New-Object psobject
+    # Name of ETW provider to be started (Optional if Guid property is provided)
+    $Config | Add-Member -NotePropertyName 'Name' -NotePropertyValue $null
+    # Guid of ETW provider to be started (Optional if Name property is provided)
+    $Config | Add-Member -NotePropertyName 'Guid' -NotePropertyValue $null
+    # List of ProviderDataItem objects used as session filters (optional)
+    # Initializes as an empty array
+    $Config | Add-Member -NotePropertyName 'Keywords' -NotePropertyValue @()
+
+    $Config
+
+} # New-ETWProviderConfig
 
 Function ConvertTo-ETWGuid {
 <#
@@ -40,9 +72,12 @@ ConvertTo-ETWGuid is a function that returns the ETW GUID for a given provider. 
 
      $ProviderGuid = [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderGuidByName($ProviderName)
      If ($ProviderGuid -eq [System.Guid]::Empty) {
+
          throw "$ProviderName either does not exist or has empty GUID"
-     }
-     else {$ProviderGuid}
+    }
+    else {
+        $ProviderGuid
+    }
 
 } # ConvertTo-ETWGuid
 
@@ -81,14 +116,17 @@ Get-ETWProvider is a function that returns objects representing ETW provider met
 #>
 
     [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.GetProviderNames() | ForEach-Object {
-        try { [System.Diagnostics.Eventing.Reader.ProviderMetadata]($_) } catch {}
+        try {
+            [System.Diagnostics.Eventing.Reader.ProviderMetadata]($_)
+        }
+        catch {}
     }
 } # Get-ETWProvider
 
 Function Get-ETWSessionNames {
 <#
 .SYNOPSIS
-Generates list of ETW session names 
+Generates list of ETW session names
 
 .DESCRIPTION
 Get-ETWSessionNames is a function that enumerates active ETW sessions and return their names in an array.
@@ -132,22 +170,47 @@ Get-ETWSessionDetails is a function that returns a TraceEventSession object for 
 
 } # Get-ETWSession
 
-Function Start-ETWSession {
-<#
-.SYNOPSIS
 
-Returns a boolean representing if 
+Function Start-ETWSession
+{
+    <#
+    .SYNOPSIS
 
-.DESCRIPTION
+    Starts an event tracing session
 
-Start-ETWProvider is a function that starts an ETW provider and will write output
-#>
+    .DESCRIPTION
+
+    Start-ETWSession is a function that starts an event tracing session with one or more ETW providers.
+    Events from this session are written to a file at the location given by the $OutputFile argument.
+
+    .PARAMETER ProviderConfig
+
+    PSObject containing the name and GUID of the ETW provider to be started.
+    Optionally the keyword property can restrict which events are enabled during the session.
+
+    .PARAMETER OutputFile
+
+    Location on disk where ETW events will be written. Full path should be provided.
+
+    .PARAMETER SessionName
+
+    Unique name describing the ETW session. This name will be visible from the Get-ETWSession function
+
+    .EXAMPLE
+
+    Start-ETWSession -ProviderConfig $Config -OutputFile C:\test.etl -SessionName TestSession
+
+    Start an ETW session named "TestSession" and write events to the file "C:\test.etl".
+    The ETW provider(s) name(s) and keywords are in the predefined variable "$Config.
+    The $Config variable should be a single instance or array of objects created from the New-ETWProviderConfig function.
+
+    #>
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [Alias("Provider")]
-        [array]
-        $ProviderName,
+        [psobject]
+        $ProviderConfig,
 
         [Parameter(Mandatory=$true)]
         [string]
@@ -155,18 +218,17 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutputFile,
-
-        [Parameter(Mandatory=$false)]
-        [ValidateScript({$_ | ForEach-Object {$_ -is [Microsoft.Diagnostics.Tracing.Session.ProviderDataItem]} })]
-        $Keywords
+        $OutputFile
     )
 
-
     BEGIN {
-
+        # Check if active session with same name already exists
         If ( (Test-IsSession -SessionName $SessionName) ) {
-            throw "$SessionName already exists. Cannot create again"
+            throw "$ProviderConfig.Name already exists. Cannot create again"
+        }
+        # Verify either provider Name or Guid was provided
+        If ( ( $ProviderConfig.Name -eq $null ) -and ($ProviderConfig.Guid -eq $null ) ) {
+            throw "Must provide either provider name or GUID"
         }
         Write-Verbose "Session name set to $SessionName"
         Write-Verbose "Provider set to $ProviderName"
@@ -181,32 +243,34 @@ Start-ETWProvider is a function that starts an ETW provider and will write outpu
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
         # Setting StopOnDispose to false will not end a session if powershell ends
         $session.StopOnDispose = $false
-        
-        # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
-        # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
-        If ($Keywords) {
-           $MatchAnyKeywords = $Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
-        } else {
-            $MatchAnyKeywords = [uint64]::MaxValue
-        }
+
 
         # Set log level. Default, and only supported option at this time, is Verbose
 
-        $TraceEventLevel = 5 # Verbose 
+        $TraceEventLevel = 5 # Verbose
         # Start session
-        $ProviderName | ForEach-Object {
-             $result = $session.EnableProvider($_, $TraceEventLevel, $MatchAnyKeywords, $null)
+        $ProviderConfig | ForEach-Object {
+
+            # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
+            # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
+            If ($_.Keywords) {
+            $MatchAnyKeywords = $_.Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
+            } else {
+                $MatchAnyKeywords = [uint64]::MaxValue
+            }
+
+            $result = $session.EnableProvider($_, $TraceEventLevel, $MatchAnyKeywords, $null)
 
         }
         # EnableProvider returns false if session if not previously exist
-        If ($result -eq $False) {
+        If ( $result -eq $False ) {
             "Started session $SessionName"
-        } 
+        }
         else {
             "Failed to start session $SessionName"
         }
-        
-        
+
+
     }
 
 } # Start-ETWSession

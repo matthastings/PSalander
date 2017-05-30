@@ -13,8 +13,10 @@ FunctionsToExport = @(
     'Get-ETWProvider',
     'Get-ETWSessionDetails',
     'Get-ETWSessionNames',
+    'New-ETWSessionConfig'
     'Start-ETWSession',
     'Stop-ETWSession'
+
 )
 
 }
