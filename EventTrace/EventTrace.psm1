@@ -253,14 +253,21 @@ Function Start-ETWSession
 
             # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
             # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
-            If ($_.Keywords) {
-            $MatchAnyKeywords = $_.Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
+            If ( $_.Keywords ) {
+                $MatchAnyKeywords = $_.Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
             } else {
                 $MatchAnyKeywords = [uint64]::MaxValue
             }
 
-            $result = $session.EnableProvider($_, $TraceEventLevel, $MatchAnyKeywords, $null)
+            # Determine if provider should be enabled by GUID or name
 
+            If ( $_.Name ) {
+                $ProviderID = $_.Name
+            } else {
+                $ProviderID = $_.Guid
+            }
+
+            $result = $session.EnableProvider($ProviderID, $TraceEventLevel, $MatchAnyKeywords, $null)
         }
         # EnableProvider returns false if session if not previously exist
         If ( $result -eq $False ) {

@@ -13,12 +13,12 @@ Import-Module $Module -Force -ErrorAction Stop
 Describe 'New-ETWProviderConfig' {
     Context 'output validation' {
         It 'Should return PS object' {
-            { (New-ETWProviderConfig).PSObject.TypeNames[1] } | Should Be 'System.Object'
+            (New-ETWProviderConfig).PSObject.TypeNames[1] | Should Be 'System.Object'
         }
+
         It 'Should contain 3 properties' {
-            { New-ETWProviderConfig | Get-Member | Where-Object {
-                $_.MemberType -eq 'NoteProperty' | Measure-Object | Select-Object count
-            } } | Should be 3
+            New-ETWProviderConfig | Get-Member | Where-Object {$_.MemberType -eq 'NoteProperty' }  | `
+                Measure-Object | Select-Object -ExpandProperty count | Should be 3
         }
     }
 }

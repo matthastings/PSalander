@@ -11,9 +11,9 @@ FunctionsToExport = @(
     'ConvertTo-ETWGuid',
     'Get-ProviderKeywords',
     'Get-ETWProvider',
+    'New-ETWProviderConfig',
     'Get-ETWSessionDetails',
     'Get-ETWSessionNames',
-    'New-ETWSessionConfig'
     'Start-ETWSession',
     'Stop-ETWSession'
 
