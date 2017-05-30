@@ -10,13 +10,13 @@ $ProviderName = "Microsoft-Windows-Kernel-Process"
 
 Import-Module $Module -Force -ErrorAction Stop
 
-Describe 'New-ETWSessionConfig' {
+Describe 'New-ETWProviderConfig' {
     Context 'output validation' {
         It 'Should return PS object' {
-            { (New-ETWSessionConfig).PSObject.TypeNames[1] } | Should Be 'System.Object' 
+            { (New-ETWProviderConfig).PSObject.TypeNames[1] } | Should Be 'System.Object'
         }
         It 'Should contain 3 properties' {
-            { New-ETWSessionConfig | Get-Member | Where-Object {
+            { New-ETWProviderConfig | Get-Member | Where-Object {
                 $_.MemberType -eq 'NoteProperty' | Measure-Object | Select-Object count
             } } | Should be 3
         }
