@@ -140,8 +140,8 @@ Describe 'Start-ETWSession' {
             (Start-ETWSession -SessionName $SessName -OutputFile $OutputFile -ProviderConfig $ProviderConfig)[1]  | Should be $true
         }
 
-        # sleep for 1 seconds to verify file is created
-        Start-Sleep -Seconds 1
+        # sleep for 2 seconds to verify file is created and events generated
+        Start-Sleep -Seconds 2
 
         It 'Should create etl output file' {
             Test-Path $OutputFile | Should Be $true   
