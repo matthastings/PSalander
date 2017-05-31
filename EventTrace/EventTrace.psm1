@@ -81,7 +81,7 @@ ConvertTo-ETWGuid is a function that returns the ETW GUID for a given provider. 
 
 } # ConvertTo-ETWGuid
 
-Function Get-ProviderKeywords {
+Function Get-ETWProviderKeywords {
 <#
 .SYNOPSIS
 
@@ -89,7 +89,7 @@ Returns provider keywords
 
 .DESCRIPTION
 
-Get-ProviderKeywords is a function that returns a provider's keywords. This function accepts an input of either a provider name or provider GUID.
+Get-ETWProviderKeywords is a function that returns a provider's keywords. This function accepts an input of either a provider name or provider GUID.
 #>
 
     param(
@@ -102,7 +102,7 @@ Get-ProviderKeywords is a function that returns a provider's keywords. This func
 
         [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderKeywords($Provider)
 
-} # Get-ProviderKeywords
+} # Get-ETWProviderKeywords
 
 Function Get-ETWProvider {
 <#

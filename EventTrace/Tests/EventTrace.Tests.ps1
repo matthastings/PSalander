@@ -52,23 +52,23 @@ Describe 'ConvertTo-ETWGuid' {
     }
 }
 
-Describe 'Get-ProviderKeywords' {
+Describe 'Get-ETWProviderKeywords' {
     Context 'input validation' {
         It 'Should require input' {
-            { Get-ProviderKeywords -Provider } | Should Throw
+            { Get-ETWProviderKeywords -Provider } | Should Throw
         }
 
         It 'Should accept string input' {
-            { Get-ProviderKeywords -Provider $ProviderName }
+            { Get-ETWProviderKeywords -Provider $ProviderName }
         }
 
         It "Should error on non-existent provider" {
-            { Get-ProviderKeywords -ProviderName "DOES NOT EXIST" } | Should Throw
+            { Get-ETWProviderKeywords -ProviderName "DOES NOT EXIST" } | Should Throw
         }
     }
     Context 'output validation'{
         It 'Should return properly formatted ProviderDataItem objects' {
-            $Result = Get-ProviderKeywords -Provider $ProviderName
+            $Result = Get-ETWProviderKeywords -Provider $ProviderName
 
             $Result[0].PSObject.TypeNames[0] | Should be 'Microsoft.Diagnostics.Tracing.Session.ProviderDataItem'
         }
@@ -113,7 +113,7 @@ Describe 'Get-ETWSessionDetails' {
 Describe 'Start-ETWSession' {
     $ProviderConfig = New-ETWProviderConfig
     $ProviderConfig.Name = $ProviderName
-    $ProviderConfig.Keywords = Get-ProviderKeywords -Provider $ProviderName | Where-Object {
+    $ProviderConfig.Keywords = Get-ETWProviderKeywords -Provider $ProviderName | Where-Object {
         $_.Name -match "_process$|_image$" }
 
     Context 'input validation' {
