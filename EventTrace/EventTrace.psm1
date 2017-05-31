@@ -269,15 +269,15 @@ Function Start-ETWSession
 
             $result = $session.EnableProvider($ProviderID, $TraceEventLevel, $MatchAnyKeywords, $null)
         }
+
         # EnableProvider returns false if session if not previously exist
         If ( $result -eq $False ) {
-            "Started session $SessionName"
+            Write-Verbose "Started session $SessionName"
         }
         else {
-            "Failed to start session $SessionName"
+            throw "Failed to start session $SessionName"
         }
-
-
+        return $true
     }
 
 } # Start-ETWSession

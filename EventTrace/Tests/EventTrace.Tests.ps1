@@ -6,9 +6,16 @@ $TestDir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $RootModuleDir = Resolve-Path "$TestDir\.."
 $Module = "$RootModuleDir\EventTrace.psd1"
 
-$ProviderName = "Microsoft-Windows-Kernel-Process"
+
 
 Import-Module $Module -Force -ErrorAction Stop
+
+# Global session name
+$SessName = "PesterETWSession"
+# Global output file
+$OutputFile = Join-Path (Resolve-Path .) "etw_session.etl"
+# Global provider
+$ProviderName = "Microsoft-Windows-Kernel-Process"
 
 Describe 'New-ETWProviderConfig' {
     Context 'output validation' {
@@ -81,14 +88,6 @@ Describe 'Get-ETWProvider' {
     }
 }
 
-Describe 'Get-ETWSessionNames' {
-    Context 'output validation' {
-        It 'Should generate output' {
-            { Get-ETWSessionNames } | Should Not BeNullOrEmpty
-        }
-    }
-}
-
 Describe 'Get-ETWSessionDetails' {
     Context 'input validation' {
         It 'Should require input' {
@@ -112,37 +111,68 @@ Describe 'Get-ETWSessionDetails' {
 
 
 Describe 'Start-ETWSession' {
-    Context 'input validation' {
-        $SName = "TestSession"
-        $OFile = ".\Output.etl"
-        $Key = @("not the right type")
+    $ProviderConfig = New-ETWProviderConfig
+    $ProviderConfig.Name = $ProviderName
+    $ProviderConfig.Keywords = Get-ProviderKeywords -Provider $ProviderName | Where-Object {
+        $_.Name -match "_process$|_image$" }
 
+    Context 'input validation' {
         It 'Should generate errors when required params are not provided' {
-            { Start-ETWProvider  -SessionConfig -SessionName -OutputFile } | Should Throw 
-        }
-        It "Should require ProviderDataItem objects in keyword param"{
-            { Start-ETWProvider -ProviderConfig $null -Keywords $Key-OutputFile $OFile -SessionName $SName }`
-                | Should Throw
+            { Start-ETWSession  -SessionConfig -SessionName -OutputFile } | Should Throw 
         }
         InModuleScope EventTrace{
             It 'Should fail to run if session already exists' {
-                Mock Test-IsSession {return $true}
+                Mock Test-IsSession { return $true }
 
-                { Start-ETWProvider -ProviderConfig $null -OutputFile $OFile -SessionName $SName } `
+                { Start-ETWSession -ProviderConfig $null -OutputFile $OutputFile -SessionName $SessName } `
                     | Should Throw
 
             }
+        }
+
+        It 'Output file should not exist' {
+            Test-Path $OutputFile | Should be $false
+        }
+    }
+
+    Context 'output validation' {
+        It 'Should create ETW session' {
+            (Start-ETWSession -SessionName $SessName -OutputFile $OutputFile -ProviderConfig $ProviderConfig)[1]  | Should be $true
+        }
+
+        # sleep for 1 seconds to verify file is created
+        Start-Sleep -Seconds 1
+
+        It 'Should create etl output file' {
+            Test-Path $OutputFile | Should Be $true   
         }
     }
 }
 
 Describe 'Stop-ETWSession' {
     Context "input validation" {
-        
         It 'Should generate an error when a non-existent session is provided' {
             { Stop-ETWSession -SessionName "does not exist" } | Should Throw
         }
     }
+    
+    Context "output validation" {
+        It 'Should stop session' {
+            (Stop-ETWSession -SessionName $SessName)[1] | Should be $true
+        }
 
+        # size of blank etl file is 64 KB
+        It 'Output file should exist and be larger than 64 KB' {
+           (Get-ChildItem $OutputFile).Length / 1Kb | Should BeGreaterThan 64
+        }
 
+        It 'Should delete output file' {
+           { Remove-Item $OutputFile -Force } | Should Not Throw
+        }
+
+        It 'Output file should not exist' {
+            Test-Path $OutputFile  | Should be $false
+        }
+    }
 }
+
