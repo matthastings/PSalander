@@ -114,7 +114,7 @@ Describe 'Start-ETWSession' {
     $ProviderConfig = New-ETWProviderConfig
     $ProviderConfig.Name = $ProviderName
     $ProviderConfig.Keywords = Get-ETWProviderKeywords -Provider $ProviderName | Where-Object {
-        $_.Name -match "_process$|_image$" }
+        $_.Name -match "_process$|_image$|_thread$" }
 
     Context 'input validation' {
         It 'Should generate errors when required params are not provided' {
