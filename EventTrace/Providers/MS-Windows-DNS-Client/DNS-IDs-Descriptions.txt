@@ -1,0 +1,681 @@
+
+   Id Description                                                                                                      
+   -- -----------                                                                                                      
+ 1000 There are currently no IPv4 DNS servers configured for any interface on this host. Please configure DNS server   
+      settings, or renew your dynamic IP settings.                                                                     
+ 1001 Interface: %1 Total DNS Server Count: %2 Index: %3 Address: %6 (%4)                                              
+ 1002 The DNS server being queried for interface %1 has changed to %3                                                  
+ 1003 The following DNS server(s) were successfully validated as active servers that can service this client. %2       
+ 1005 The client was unable to validate the following as active DNS server(s) that can service this client. The        
+      server(s) may be temporarily unavailable, or may be incorrectly configured. %2                                   
+ 1007 The primary DNS suffix for this machine is missing. In the absence of a primary DNS suffix, short unqualified    
+      names may not resolve through DNS                                                                                
+ 1008 The primary DNS suffix for this machine is missing. In the absence of a primary DNS suffix, short unqualified    
+      names may not resolve through DNS                                                                                
+ 1009 The primary DNS suffix for this machine (%1) does not match the Active Directory domain (%2) that it is          
+      currently joined to.                                                                                             
+ 1010 The primary DNS suffix for this machine (%1) does not match the Active Directory domain (%2) that it is          
+      currently joined to.                                                                                             
+ 1011 There was an error while attempting to read the local hosts file.                                                
+ 1012 There was an error while attempting to read the local hosts file.                                                
+ 1013 Name resolution for the name %1 timed out after none of the configured DNS servers responded.                    
+ 1014 Name resolution for the name %1 timed out after none of the configured DNS servers responded.                    
+ 1015 Name resolution for the name %1 timed out after the DNS server %3 did not respond.                               
+ 1016 A name not found error was returned for the name %1. Check to ensure that the name is correct. The response was  
+      sent by the server at %3.                                                                                        
+ 1017 The DNS server's response to a query for name %1 indicates that no records of the type queried are available,    
+      but could indicate that other records for the same name are present.                                             
+ 1018 The response for the query %1 was a Link Local IP address %3. The response was sent by the server at %5.         
+ 1019 There are currently no IPv6 DNS servers configured for any interface on this host. Please configure DNS server   
+      settings, or renew your dynamic IP settings.                                                                     
+ 1020 Read DNS Name Resolution Policy Table: Key Name %1: DNSSEC Settings: DnsSecValidationRequired %2,                
+      DnsQueryOverIPSec %3, DnsEncryption %4 Direct Access Settings: DirectAccessServerList %5, EnableRemoteIPSEC %6   
+      RemoteEncryption %7 ProxyType %8 ProxyName %9                                                                    
+ 1021 Matched Effective policy for query name %1: Key Name %2: DnsSecValidationRequired %3, DnsQueryOverIPSec %4,      
+      DnsEncryption %5 DirectAccessServerList %6, ProxyType %7 ProxyName %8                                            
+ 1022 Name resolution for the name, %1, will not fall back to LLMNR or NetBIOS                                         
+ 1023 Name resolution policy table has been corrupted. DNS resolution will fail until it is fixed. Contact your        
+      network administrator. For more information: read policy table for rule %1 failed with error %2                  
+ 1024 Transaction ID of the response for query %1 from server %3 did not match                                         
+ 1025 The DNS server IP %3 of the response for query %1 is not configured on the client                                
+ 1026 The question (%2) in the response from server %4 does not match the original question %1                         
+ 1027 DNS Name resolution for the name, %1, failed because the client was unable to contact DNS servers. At least one  
+      of the interfaces is not in a private network and name resolution will not fall back to LLMNR or NetBIOS         
+ 1028 Matched effective policy for query name %1: Key Name %2: DnsSecValidationRequired %3, DnsQueryOverIPSec %4,      
+      DnsEncryption %5 DirectAccessServerList %6, ProxyType %7 ProxyName %8 GenericServerList %9 IdnConfig %10         
+ 3000 DNS Query is initiated for the name %1 and for the type %2 with query options %3                                 
+ 3001 DNS Query operation is completed with result %1                                                                  
+ 3002 DNS Cache lookup is initiated for the name %1 and for the type %2 with query options %3                          
+ 3003 DNS Cache lookup operation for the name %1 and for the type %2 is completed with result %3                       
+ 3004 DNS FQDN Query is initiated for the name %1 and for the type %2 with query options %3                            
+ 3005 DNS FQDN Query operation for the name %1 and for the type %2 is completed with result %3                         
+ 3006 DNS query is called for the name %1, type %2, query options %3, Server List %4, isNetwork query %5, network      
+      index %6, interface index %7, is asynchronous query %8                                                           
+ 3007 DnsQueryEx for the name %1 is pending                                                                            
+ 3008 DNS query is completed for the name %1, type %2, query options %3 with status %4 Results %5                      
+ 3009 Network query initiated for the name %1 (is parallel query %2) on network index %3 with interface count %4 with  
+      first interface name %5, local addresses %6 and Dns Servers %7                                                   
+ 3010 DNS Query sent to DNS Server %3 for name %1 and type %2                                                          
+ 3011 Received response from DNS Server %3 for name %1 and type %2 with response status %4                             
+ 3012 NETBIOS query is initiated for name %1 on network index %2 with inteface count %3 with first interface name %4   
+      and local addresses %5                                                                                           
+ 3013 NETBIOS query is completed for name %1 with status %2 and results %3                                             
+ 3014 NETBIOS query for the name %1 is pending                                                                         
+ 3015 DnsQueryEx is canceled for the name %1                                                                           
+ 3016 Cache lookup called for name %1, type %2, options %3 and interface index %4                                      
+ 3018 Cache lookup for name %1, type %2 and option %3 returned %4 with results %5                                      
+ 3019 Query wire called for name %1, type %2, interface index %3 and network index %4                                  
+ 3020 Query response for name %1, type %2, interface index %3 and network index %4 returned %5 with results %6         
+ 8001 Unable to start DNS Client service. Could not start the Remote Procedure Call (RPC) interface for this service.  
+      To correct the problem, you may restart the RPC and DNS Client services. To do so, use the following commands at 
+      a command prompt: (1) type 'net start rpc' to start the RPC service, and (2) type 'net start dnscache' to start  
+      the DNS Client service. See event details for specific error code information.                                   
+ 8002 Unable to start DNS Client service because the system failed to allocate memory and may be out of available      
+      memory. Try closing any applications not in use or reboot the computer. See event details for specific error     
+      code information.                                                                                                
+ 8003 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS Server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The cause of this DNS registration failure was because the DNS update request timed out after being sent to the  
+      specified DNS Server. This is probably because the authoritative DNS server for the name being updated is not    
+      running.                                                                                                         
+                                                                                                                       
+      You can manually retry registration of the network adapter and its settings by typing 'ipconfig /registerdns' at 
+      the command prompt. If problems still  persist, contact your network systems administrator to verify network     
+      conditions.                                                                                                      
+ 8004 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The cause of this DNS registration failure was because of DNS server failure. This may be due to a zone transfer 
+      that has locked the DNS server for the applicable zone that your computer needs to register itself with.         
+                                                                                                                       
+      (The applicable zone should typically correspond to the Adapter-specific Domain Suffix that was indicated        
+      above.) You can manually retry registration of the network adapter and its settings by typing 'ipconfig          
+      /registerdns' at the command prompt. If problems still persist, contact your network systems administrator to    
+      verify network conditions.                                                                                       
+ 8005 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason it could not register was because either: (a) the DNS server does not support the DNS dynamic update  
+      protocol, or (b) the primary zone authoritative for the registering names does not currently accept dynamic      
+      updates.                                                                                                         
+                                                                                                                       
+      To add or register a DNS host (A or AAAA) resource record using the specific DNS name for this adapter, contact  
+      your DNS server or network systems administrator.                                                                
+ 8006 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason it could not register was because the DNS server refused the dynamic update request. This could       
+      happen for the following reasons: (a) current DNS update policies do not allow this computer to update the DNS   
+      domain name configured for this adapter, or (b) the authoritative DNS server for this DNS domain name does not   
+      support the DNS dynamic update protocol.                                                                         
+                                                                                                                       
+      To register a DNS host (A or AAAA) resource record using the specific DNS domain name for this adapter, contact  
+      your DNS server or network systems administrator.                                                                
+ 8007 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not register the DNS update request because of a security related problem. This could happen    
+      for the following reasons: (a) the DNS domain name that your computer is trying to register could not be updated 
+      because your computer does not have the right permissions, or (b) there might have been a problem negotiating    
+      valid credentials with the DNS server to update.                                                                 
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator. See event details for specific error code information.                                            
+ 8008 The system failed to register network adapter with settings:                                                     
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the DNS update request could not be completed was because of a system problem. You can manually retry 
+      DNS registration of the network adapter and its settings by typing 'ipconfig /registerdns' at the command        
+      prompt. If problems still persist, contact your DNS server or network systems administrator. See event details   
+      for specific error code information.                                                                             
+ 8009 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The reason that the system could not register these RRs was because the update request that was sent to the      
+      specified DNS server timed out. This is probably because the authoritative DNS server for the name being         
+      registered is not running.                                                                                       
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator. See event details for specific error code information.                                            
+ 8010 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The cause was DNS server failure. This may be because the reverse lookup zone is busy or missing on the DNS      
+      server that your computer needs to update. In most cases, this is a minor problem because it does not affect     
+      normal (forward) name resolution.                                                                                
+                                                                                                                       
+      If reverse (address-to-name) resolution is required for your computer, you can manually retry DNS registration   
+      of the network adapter and its settings by typing 'ipconfig /registerdns' at the command prompt. If problems     
+      still persist, contact your DNS server or network systems administrator. See event details for specific error    
+      code information.                                                                                                
+ 8011 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The reason that the system could not register these RRs was because (a) either the DNS server does not support   
+      the DNS dynamic update protocol, or (b) the authoritative zone where these records are to be registered does not 
+      allow dynamic updates.                                                                                           
+                                                                                                                       
+      To register DNS pointer (PTR) resource records using the specific DNS domain name and IP addresses for this      
+      adapter, contact your DNS server or network systems administrator.                                               
+ 8012 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The reason that the system could not register these RRs was because the DNS server refused the update request.   
+      The cause of this could be (a) your computer is not allowed to update the adapter-specified DNS domain name, or  
+      (b) because the DNS server authoritative for the specified name does not support the DNS dynamic update protocol.
+                                                                                                                       
+      To register the DNS pointer (PTR) resource records using the specific DNS domain name and IP addresses for this  
+      adapter, contact your DNS server or network systems administrator.                                               
+ 8013 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The reason that the system could not register these RRs was because of a security related problem. The cause of  
+      this could be (a) your computer does not have permissions to register and update the specific DNS domain name    
+      set for this adapter, or (b) there might have been a problem negotiating valid credentials with the DNS server   
+      during the processing of the update request.                                                                     
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator.                                                                                                   
+ 8014 The system failed to register pointer (PTR) resource records (RRs) for network adapter                           
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs during the update request was because of a system problem.    
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator. See event details for specific error code information.                                            
+ 8015 The system failed to register host (A or AAAA) resource records (RRs) for network adapter                        
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs was because the update request it sent to the DNS server      
+      timed out. The most likely cause of this is that the DNS server authoritative for the name it was attempting to  
+      register or update is not running at this time.                                                                  
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator.                                                                                                   
+ 8016 The system failed to register host (A or AAAA) resource records (RRs) for network adapter                        
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs was because the DNS server failed the update request. The     
+      most likely cause of this is that the authoritative DNS server required to process this update request has a     
+      lock in place on the zone, probably because a zone transfer is in progress.                                      
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator.                                                                                                   
+ 8017 The system failed to register host (A or AAAA) resource records for network adapter                              
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      Either the DNS server does not support the DNS dynamic update protocol or the authoritative zone for the         
+      specified DNS domain name does not accept dynamic updates.                                                       
+                                                                                                                       
+      To register the DNS host (A or AAAA) resource records using the specific DNS domain name and IP addresses for    
+      this adapter, contact your DNS server or network systems administrator.                                          
+ 8018 The system failed to register host (A or AAAA) resource records (RRs) for network adapter                        
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs was because the DNS server contacted refused the update       
+      request. The reasons for this might be (a) you are not allowed to update the specified DNS domain name, or (b)   
+      because the DNS server authoritative for this name does not support the DNS dynamic update protocol.             
+                                                                                                                       
+      To register the DNS host (A or AAAA) resource records using the specific DNS domain name and IP addresses for    
+      this adapter, contact your DNS server or network systems administrator.                                          
+ 8019 The system failed to register host (A or AAAA) resource records (RRs) for network adapter                        
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs was because of a security related problem. The cause of this  
+      could be (a) your computer does not have permissions to register and update the specific DNS domain name set for 
+      this adapter, or (b) there might have been a problem negotiating valid credentials with the DNS server during    
+      the processing of the update request.                                                                            
+                                                                                                                       
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator. See event details for specific error code information.                                            
+ 8020 The system failed to register host (A or AAAA) resource records (RRs) for network adapter                        
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not register these RRs during the update request was because of a system problem.    
+      You can manually retry DNS registration of the network adapter and its settings by typing 'ipconfig              
+      /registerdns' at the command prompt. If problems still persist, contact your DNS server or network systems       
+      administrator. See event details for specific error code information.                                            
+ 8021 The system failed to update and remove registration for the network adapter with settings:                       
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason for this failure is because the DNS server it sent the update request to timed out. The most likely   
+      cause of this failure is that the DNS server authoritative for the zone where the registration was originally    
+      made is either not running or unreachable through the network at this time.                                      
+ 8022 The system failed to update and remove registration for the network adapter with settings:                       
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason for this failure is because the DNS server it sent the update to failed the update request. A         
+      possible cause of this failure is that the DNS server required to process this update request has a lock in      
+      place on the zone, probably because a zone transfer is in progress.                                              
+                                                                                                                       
+                                                                                                                       
+ 8023 The system failed to update and remove registration for the network adapter with settings:                       
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason for this failure is because the DNS server sent the update either (a) does not support the DNS        
+      dynamic update protocol, or (b) the authoritative zone for the specified DNS domain name does not currently      
+      accept DNS dynamic updates.                                                                                      
+ 8024 The system failed to update and remove registration for the network adapter with settings:                       
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not perform the update request was the DNS server contacted refused update request.  
+      The cause of this is (a) this computer is not allowed to update the specified DNS domain name, or (b) because    
+      the DNS server authoritative for the zone that requires updating does not support the DNS dynamic update         
+      protocol.                                                                                                        
+ 8025 The system failed to update and remove registration for the network adapter with settings:                       
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the system could not perform the update request was because of a security related problem. The cause  
+      of this could be (a) your computer does not have permissions to register and update the specific DNS domain name 
+      set for this adapter, or (b) there might have been a problem negotiating valid credentials with the DNS server   
+      during the processing of the update request.                                                                     
+                                                                                                                       
+      See event details for specific error code information.                                                           
+ 8026 The system failed to update and remove the DNS registration for the network adapter with settings:               
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not update to remove this DNS registration because of a system problem. See event details for   
+      specific error code information.                                                                                 
+ 8027 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these PTR RRs because the update request timed out while awaiting a response from    
+      the DNS server. This is probably because the DNS server authoritative for the zone that requires update is not   
+      running.                                                                                                         
+ 8028 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address : %6                                                                                       
+                                                                                                                       
+      The system could not remove these PTR RRs because the DNS server failed the update request. A possible cause is  
+      that a zone transfer is in progress, causing a lock for the zone at the DNS server authorized to perform the     
+      updates for these RRs.                                                                                           
+ 8029 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these PTR RRs because either the DNS server does not support the DNS dynamic update  
+      protocol or the authoritative zone that contains these RRs does not accept dynamic updates.                      
+ 8030 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these PTR RRs because the DNS server refused the update request. The cause of this   
+      might be (a) this computer is not allowed to update the specified DNS domain name specified by these settings,   
+      or (b) because the DNS server authorized to perform updates for the zone that contains these RRs does not        
+      support the DNS dynamic update protocol.                                                                         
+ 8031 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these PTR RRs because of a security related problem. The cause of this could be that 
+      (a) your computer does not have permissions to remove and update the specific DNS domain name or IP addresses    
+      configured for this adapter, or (b) there might have been a problem negotiating valid credentials with the DNS   
+      server during the processing of the update request. See event details for specific error code information.       
+ 8032 The system failed to update and remove pointer (PTR) resource records (RRs) for network adapter                  
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Adapter-specific Domain Suffix : %3                                                                   
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address :                                                                                          
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these PTR RRs because because of a system problem. See event details for specific    
+      error code information.                                                                                          
+ 8033 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+               The system could not remove these host (A or AAAA) RRs because the update request timed out while       
+      awaiting a response from the DNS server. This is probably because the DNS server authoritative for the zone      
+      where these RRs need to be updated is either not currently running or reachable on the network.                  
+ 8034 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The system could not remove these host (A or AAAA) RRs because the DNS server failed the update request. A       
+      possible cause is that a zone transfer is in progress, causing a lock for the zone at the DNS server authorized  
+      to perform the updates for these RRs.                                                                            
+ 8035 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason for this failure is because the DNS server sent the update either (a) does not support the DNS        
+      dynamic update protocol, or (b) the authoritative zone for the DNS domain name specified in these host (A or     
+      AAAA) RRs does not currently accept DNS dynamic updates.                                                         
+ 8036 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The request to remove these records failed because the DNS server refused the update request. The cause of this  
+      might be that either (a) this computer is not allowed to update the DNS domain name specified by these settings, 
+      or (b) because the DNS server authorized to perform updates for the zone that contains these RRs does not        
+      support the DNS dynamic update protocol.                                                                         
+ 8037 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason for this failure was because of a security related problem. The cause of this could be that (a) your  
+      computer does not have permissions to remove and update the specific DNS domain name or IP addresses configured  
+      for this adapter, or (b) there might have been a problem negotiating valid credentials with the DNS server       
+      during the processing of the update request. See event details for specific error code information.              
+ 8038 The system failed to update and remove host (A or AAAA) resource records (RRs) for network adapter               
+      with settings:                                                                                                   
+                                                                                                                       
+                 Adapter Name : %1                                                                                     
+                 Host Name : %2                                                                                        
+                 Primary Domain Suffix : %3                                                                            
+                 DNS server list :                                                                                     
+                   %4                                                                                                  
+                 Sent update to server : %5                                                                            
+                 IP Address(es) :                                                                                      
+                   %6                                                                                                  
+                                                                                                                       
+      The reason the update request failed was because of a system problem. See event details for specific error code  
+      information.                                                                                                     
+60004 Error: %1 Location: %2 Context: %3                                                                               
+60005 Warning: %1 Location: %2 Context: %3                                                                             
+60006 Transitioned to State: %1 Context: %2                                                                            
+60007 Updated Context: %1 Update Reason: %2                                                                            
+60008 Name resolution policy table has been corrupted. DNS resolution will fail until it is fixed. Contact your        
+      network administrator. For more information: read policy table for rule %1 failed with error %2                  
+60101 SourceAddress: %1 SourcePort: %2 DestinationAddress: %3 DestinationPort: %4 Protocol: %5 ReferenceContext: %6    
+60102 SourceAddress: %1 SourcePort: %2 DestinationAddress: %3 DestinationPort: %4 Protocol: %5 ReferenceContext: %6    
+60103 Interface Guid: %1 IfIndex: %2 Interface Luid: %3 ReferenceContext: %4                                           
+
+
+
