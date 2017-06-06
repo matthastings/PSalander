@@ -1,3 +1,6 @@
+PS> Get-ETWProvider  | Where-Object { $_.ProviderName -eq 'Microsoft-Windows-DNS-Client'} | % { $_.Events } | `
+select id,description | ft -Wrap -Property Id,Description | out-string | `
+Set-Content .\Providers\MS-Windows-DNS-Client\DNS-IDs-Descriptions.txt
 
    Id Description                                                                                                      
    -- -----------                                                                                                      

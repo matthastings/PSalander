@@ -60,3 +60,6 @@ try {
 This does throw an exception on EventData because there are two EventData methods, resulting in an ambiguous call.
 
 PIDs in the ETL file for dns lookups correspond to svchost processes.
+
+Ids     Purpose
+1001    
