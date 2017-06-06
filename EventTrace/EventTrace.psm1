@@ -36,7 +36,8 @@ Function New-ETWProviderConfig
 
     .DESCRIPTION
 
-    New-ETWProviderConfig is a function that initializations and returns a new ETWProviderConfig object. The object is made of three properties: Name, Guid, and Keywords.
+    New-ETWProviderConfig is a function that initializations and returns a new ETWProviderConfig object. 
+    The object is made of three properties: Name, Guid, and Keywords.
 
     .EXAMPLE
 
@@ -57,16 +58,30 @@ Function New-ETWProviderConfig
 
 } # New-ETWProviderConfig
 
-Function ConvertTo-ETWGuid {
-<#
-.SYNOPSIS
 
-Returns a provider GUID given
+Function ConvertTo-ETWGuid
+{
+    <#
+    .SYNOPSIS
+    
+    Converts an ETW provider name to a GUID
 
-.DESCRIPTION
+    .DESCRIPTION
+    
+    ConvertTo-ETWGuid is a function that takes a provider name [string] and return the its corresponding GUID
 
-ConvertTo-ETWGuid is a function that returns the ETW GUID for a given provider. This functions requires the provider name as an input argument.
-#>
+    .PARAMETER ProviderName
+
+    Name of an ETW provider
+
+    .EXAMPLE
+    
+    ConvertTo-ETWGuid -ProviderName Microsoft-Windows-Kernel-Process
+
+    Returns GUID associated with the Microsoft-Windows-Kernel-Process provider
+
+    #>
+
 
     [CmdletBinding()]
     param(
@@ -86,39 +101,60 @@ ConvertTo-ETWGuid is a function that returns the ETW GUID for a given provider. 
 
 } # ConvertTo-ETWGuid
 
-Function Get-ETWProviderKeywords {
-<#
-.SYNOPSIS
+Function Get-ETWProviderKeywords
+{
+    
+    <#
+    .SYNOPSIS
+    
+    Collects event keywords for a specified ETW provider
 
-Returns provider keywords
+    .DESCRIPTION
+    
+    Get-ETWProviderKeywords is a function that collections keywords for a given ETW provider.
+    Keywords describe events collected by the provider and can be used to restrict what events are captured.
 
-.DESCRIPTION
+    .PARAMETER Provider
+    
+    Name of an ETW provider
 
-Get-ETWProviderKeywords is a function that returns a provider's keywords. This function accepts an input of either a provider name or provider GUID.
-#>
+    .EXAMPLE
+    
+    Get-ETWProviderKeywords -ProviderName Microsoft-Windows-Kernel-Process
+
+    Returns keywords associated with the Microsoft-Windows-Kernel-Process provider
+
+    #>
 
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        $Provider)
+        $ProviderName)
 
-        If ($Provider -is [string]) {
-            $Provider = ConvertTo-ETWGuid($Provider)
+        If ($ProviderName -is [string]) {
+            $ProviderName = ConvertTo-ETWGuid($ProviderName)
         }
 
-        [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderKeywords($Provider)
+        [Microsoft.Diagnostics.Tracing.Session.TraceEventProviders]::GetProviderKeywords($ProviderName)
 
 } # Get-ETWProviderKeywords
 
 Function Get-ETWProvider {
-<#
-.SYNOPSIS
+    <#
+    .SYNOPSIS
 
-Returns a ProviderMetadata object for each enabled ETW provider.
+    Returns a ProviderMetadata object for each enabled ETW provider.
 
-.DESCRIPTION
+    .DESCRIPTION
 
-Get-ETWProvider is a function that returns objects representing ETW provider metadata
-#>
+    Get-ETWProvider is a function that returns objects representing ETW provider metadata
+
+    .EXAMPLE
+
+    Get-ETWProvider
+
+    Returns list of all ETW providers
+
+    #>
 
     [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.GetProviderNames() | ForEach-Object {
         try {
@@ -129,32 +165,48 @@ Get-ETWProvider is a function that returns objects representing ETW provider met
 } # Get-ETWProvider
 
 Function Get-ETWSessionNames {
-<#
-.SYNOPSIS
-Generates list of ETW session names
+    <#
+    .SYNOPSIS
 
-.DESCRIPTION
-Get-ETWSessionNames is a function that enumerates active ETW sessions and return their names in an array.
+    Generates list of ETW session names
 
-.EXAMPLE
-Get-ETWSessionNames
+    .DESCRIPTION
 
-#>
+    Get-ETWSessionNames is a function that enumerates active ETW sessions and return their names in an array.
+
+    .EXAMPLE
+
+    Get-ETWSessionNames
+
+    Returns all active ETW sessions
+
+    #>
+
      [Microsoft.Diagnostics.Tracing.Session.TraceEventSession]::GetActiveSessionNames()
 }
 
 
 Function Get-ETWSessionDetails {
-<#
-.SYNOPSIS
+    <#
+    .SYNOPSIS
 
-Returns an array of active ETW session GetProviderNames
+    Returns an array of active ETW session GetProviderNames
 
-.DESCRIPTION
+    .DESCRIPTION
 
-Get-ETWSessionDetails is a function that returns a TraceEventSession object for a given session name
+    Get-ETWSessionDetails is a function that returns a TraceEventSession object for a given session name
 
-#>
+    .PARAMETER SessionName
+
+    Name of ETW session
+
+    .Example
+
+    Get-ETWSessionDetails ProcessMonitor
+
+    Returns session details about the "ProcessMonitor" ETW session
+
+    #>
 
     [CmdletBinding()]
     param(
@@ -288,15 +340,27 @@ Function Start-ETWSession
 } # Start-ETWSession
 
 Function Stop-ETWSession {
-<#
-.SYNOPSIS
+    <#
+    .SYNOPSIS
 
-Stop an ETW session
+    Stop an ETW session
 
-.DESCRIPTION
+    .DESCRIPTION
 
-Stop-ETWSession is a function that attaches to and stops an existing ETW session
-#>
+    Stop-ETWSession is a function that attaches to and stops an existing ETW session
+
+    .PARAMETER SessionName
+
+    Name of valid ETW Session
+
+    .EXAMPLE
+
+    Stop-ETWSession ProcessMonitor
+
+    Stops ETW session name "ProcessMonitor"
+
+    #>
+    
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
