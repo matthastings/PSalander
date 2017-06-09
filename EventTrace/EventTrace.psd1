@@ -9,6 +9,7 @@ Author = "Matt Hastings & Dave Hull"
 # functions to export
 FunctionsToExport = @(
     'ConvertTo-ETWGuid',
+    'Get-ETWEventLog',
     'Get-ETWProviderKeywords',
     'Get-ETWProvider',
     'New-ETWProviderConfig',

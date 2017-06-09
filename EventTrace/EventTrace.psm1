@@ -10,6 +10,11 @@ catch {
 if (-Not ([appdomain]::currentdomain.getassemblies()).location -contains $path) {
     throw "Failed to load TraceEvent DLL"
 }
+Get-ChildItem $PSScriptRoot -Directory | 
+    Where-Object { $_.Name -ne 'Tests' } | 
+    Get-ChildItem -Recurse | 
+    Where-Object { $_.Name -match ".*\.ps1$" } | 
+    ForEach-Object { . $_.FullName }
 
 # Start Private Functions
 Function Test-IsSession
@@ -315,3 +320,50 @@ Stop-ETWSession is a function that attaches to and stops an existing ETW session
     }
 
 } # Stop-ETWSession
+
+Function Get-ETWEventLog
+{
+    <#
+    .SYNOPSIS
+
+    Parses ETL event log for forensically significant events
+
+    .DESCRIPTION
+    
+    Get-ETWEventLog is a function tha parses an ETW event trace log for forensically significant information.
+    The raw log can be read using the builtin Get-WinEvent cmdlet. 
+
+    .PARAMETER Path
+    
+    Path of the etl file to parse
+
+    .EXAMPLE
+    
+    Get-ETWEventLog -Path C:\logs\process.etl
+
+    Converts process.etl for forensically significant ETW events for supported providers and returns objects representing the forenically signifant information. 
+
+
+    #>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path
+    )
+
+    # Hash table mapping of supported ETW providers to parser functions
+    $script:Providers = @{
+    'Microsoft-Windows-Kernel-Process' = 'KernelProcessParser'
+    }
+
+    $Events = @{}
+
+    Get-WinEvent -Path $Path -Oldest | Where-Object {
+        $script:Providers.ContainsKey($_.ProviderName) } | ForEach-Object {
+            &$script:Providers[$_.ProviderName] -Event $_ }
+
+    $Events.Values
+
+}

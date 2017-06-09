@@ -150,7 +150,7 @@ Describe 'Start-ETWSession' {
 }
 
 Describe 'Stop-ETWSession' {
-    Context "input validation" {
+    Context 'input validation' {
         It 'Should generate an error when a non-existent session is provided' {
             { Stop-ETWSession -SessionName "does not exist" } | Should Throw
         }
@@ -164,8 +164,33 @@ Describe 'Stop-ETWSession' {
         # size of blank etl file is 64 KB
         It 'Output file should exist and be larger than 64 KB' {
            (Get-ChildItem $OutputFile).Length / 1Kb | Should BeGreaterThan 64
-        }
+        } 
+   }
 
+}
+
+Describe 'Get-ETWEventLog' {
+    Context 'input validation' {
+        It 'Should error when required parameter not provided' {
+            { Get-ETWEventLog -Path } | Should Throw
+        }
+    }
+
+    Context 'output validation' {
+        It 'Should properly parse output' {
+            (Get-ETWEventLog -Path $OutputFile).Count | Should BeGreaterThan 1 
+        }
+    }
+}
+
+
+Describe 'Cleanup tests' {
+    Context 'Remove module' {
+        It 'Should not throw error removing module' {
+            { Remove-Module 'EventTrace' } | Should Not Throw
+        }
+    }
+    Context 'Delete test etl file' {
         It 'Should delete output file' {
            { Remove-Item $OutputFile -Force } | Should Not Throw
         }
