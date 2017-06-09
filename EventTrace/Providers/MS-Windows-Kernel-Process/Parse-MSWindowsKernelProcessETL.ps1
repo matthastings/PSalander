@@ -37,15 +37,28 @@ function ImageLoad
 function ProcessStart
 {   
     param($Event)
-    
+
     $NewProcessObject = New-Object -TypeName psobject
-    $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.Properties[0].value
+    $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.ProcessID
     $NewProcessObject | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
     $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $Event.Properties[2].value
     $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
     $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
-    $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
+    $Events.Add( [int32]$Event.ProcessID, $NewProcessObject )
+
+    # Check if parent process is known and add to list
+    If ( $Events.ContainsKey( $Event.Properties[2] ) ) {
+
+        # Check if property has been added and if not then add
+         If ( ($Events[ [int32]$Event.Properties[2] ].PSObject.Properties.Name -match 'ChildProcesses').Count -lt 1 ) {
+
+            $Events[ [int32]$Properties[2] ] | Add-Member -NotePropertyName 'ChildProcesses' -NotePropertyValue @()
+
+        }
+
+        $Events[ [int32]$Event.Properties[2] ].ChildProcesses += $NewProcessObject
+    }
     
 } # ProcessStart
 

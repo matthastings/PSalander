@@ -176,11 +176,11 @@ Describe 'Get-ETWEventLog' {
         }
     }
 
-    Context 'output validation' {
-        It 'Should properly parse output' {
-            (Get-ETWEventLog -Path $OutputFile).Count | Should BeGreaterThan 1 
-        }
-    }
+    # Context 'output validation' {
+        # It 'Should properly parse output' {
+            # (Get-ETWEventLog -Path $OutputFile).Count | Should BeGreaterThan 1 
+        # }
+    # }
 }
 
 
