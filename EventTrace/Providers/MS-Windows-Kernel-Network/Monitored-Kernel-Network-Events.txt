@@ -70,8 +70,4 @@ Event Log xml
         <Data Name="sndwinscale">9</Data>
         <Data Name="seqnum">0</Data>
         <Data Name="connid">0</Data>
-    </EventData>
-
-    [System.Net.IPAddress]$test = 1142973847
-
-    $DestPort = / 256
+    </EventData>4
