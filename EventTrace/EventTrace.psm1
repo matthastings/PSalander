@@ -53,6 +53,8 @@ Function New-ETWProviderConfig
     # List of ProviderDataItem objects used as session filters (optional)
     # Initializes as an empty array
     $Config | Add-Member -NotePropertyName 'Keywords' -NotePropertyValue @()
+    # Optional Provider options
+    $Config | Add-Member -NotePropertyName 'Options' -NotePropertyValue $null
 
     $Config
 
@@ -163,6 +165,35 @@ Function Get-ETWProvider {
         catch {}
     }
 } # Get-ETWProvider
+
+
+
+
+Function New-ETWProviderOption 
+{
+    <#
+    .SYNOPSIS
+    
+    Creates new TraceEventProviderOptions object
+
+    .DESCRIPTION
+    
+    New-ETWProviderOption is a function that creates a new TraceEventProviderOptions object with the EventIDsToEnable/Disable properties set as lists.
+
+    .EXAMPLE
+    
+    New-ETWProviderOption
+
+    Creates a new TraceEventProviderOptions object with the EventIDsToEnable/Disable properties set as lists. Adding to these properties will limit what events are captured during an ETW session.
+
+    #>
+
+    $Options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventProviderOptions
+    $Options.EventIDsToEnable = New-Object System.Collections.Generic.List[Int]
+    $Options.EventIDsToDisable = New-Object System.Collections.Generic.List[Int]
+
+    $Options
+}
 
 Function Get-ETWSessionNames {
     <#
@@ -307,7 +338,7 @@ Function Start-ETWSession
         $TraceEventLevel = 5 # Verbose
         # Start session
         $ProviderConfig | ForEach-Object {
-
+            
             # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
             # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
             If ( $_.Keywords ) {
@@ -324,7 +355,7 @@ Function Start-ETWSession
                 $ProviderID = $_.Guid
             }
 
-            $result = $session.EnableProvider($ProviderID, $TraceEventLevel, $MatchAnyKeywords, $null)
+            $result = $session.EnableProvider($ProviderID, $TraceEventLevel, $MatchAnyKeywords, $_.Options) 
         }
 
         # EnableProvider returns false if session if not previously exist

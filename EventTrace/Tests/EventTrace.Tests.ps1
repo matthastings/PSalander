@@ -25,7 +25,7 @@ Describe 'New-ETWProviderConfig' {
 
         It 'Should contain 3 properties' {
             New-ETWProviderConfig | Get-Member | Where-Object {$_.MemberType -eq 'NoteProperty' }  | `
-                Measure-Object | Select-Object -ExpandProperty count | Should be 3
+                Measure-Object | Select-Object -ExpandProperty count | Should be 4
         }
     }
 }
@@ -71,6 +71,14 @@ Describe 'Get-ETWProviderKeywords' {
             $Result = Get-ETWProviderKeywords -Provider $ProviderName
 
             $Result[0].PSObject.TypeNames[0] | Should be 'Microsoft.Diagnostics.Tracing.Session.ProviderDataItem'
+        }
+    }
+}
+
+Describe 'New-ETWProviderOption' {
+    Context 'output validation' {
+        It 'Should return provider options object' {
+            (New-ETWProviderOption).PSObject.TypeNames[0] | Should be 'Microsoft.Diagnostics.Tracing.Session.TraceEventProviderOptions'
         }
     }
 }

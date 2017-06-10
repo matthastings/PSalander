@@ -2,7 +2,7 @@ function ImageLoad
 {
     param($Event)
 
-    $ProcID = $Event.ProcessID
+    $ProcID = $Event.Properties[2].value
 
     $NewLoadImgObj = New-Object -TypeName psobject
     $NewLoadImgObj | Add-Member -NotePropertyName 'ImageBase' -NotePropertyValue $Event.Properties[0].value
@@ -10,7 +10,7 @@ function ImageLoad
     $NewLoadImgObj | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[6].value
 
 
-    If ( $Events.ContainsKey( $ProcID ) ) {
+    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
 
         If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'LoadedImages').Count -lt 1 ) {
             
@@ -38,26 +38,28 @@ function ProcessStart
 {   
     param($Event)
 
+    $ParentPID = $Event.Properties[2].value
+
     $NewProcessObject = New-Object -TypeName psobject
-    $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.ProcessID
+    $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.Properties[0].value
     $NewProcessObject | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
-    $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $Event.Properties[2].value
+    $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
     $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
     $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
-    $Events.Add( [int32]$Event.ProcessID, $NewProcessObject )
+    $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
 
     # Check if parent process is known and add to list
-    If ( $Events.ContainsKey( $Event.Properties[2] ) ) {
+    If ( $Events.ContainsKey( $ParentPID ) ) {
 
         # Check if property has been added and if not then add
-         If ( ($Events[ [int32]$Event.Properties[2] ].PSObject.Properties.Name -match 'ChildProcesses').Count -lt 1 ) {
+         If ( ($Events[ [int32]$ParentPID ].PSObject.Properties.Name -match 'ChildProcesses').Count -lt 1 ) {
 
             $Events[ [int32]$Properties[2] ] | Add-Member -NotePropertyName 'ChildProcesses' -NotePropertyValue @()
 
         }
 
-        $Events[ [int32]$Event.Properties[2] ].ChildProcesses += $NewProcessObject
+        $Events[ [int32]$ParentPID ].ChildProcesses += $NewProcessObject
     }
     
 } # ProcessStart
@@ -71,7 +73,7 @@ function ProcessStop
 
     If ( $Events.ContainsKey( [int32]$ProcId ) ) {
 
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $Event.Properties[2].value
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $ParentPID.value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ReadOperationCount' -NotePropertyValue $Event.Properties[9].value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'WriteOperationCount' -NotePropertyValue $Event.Properties[10].value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
@@ -82,7 +84,7 @@ function ProcessStop
 
         $NewProcessObject = New-Object -TypeName psobject
         $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $ProcID
-        $NewProcessObject | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $Event.Properties[2].value
+        $NewProcessObject | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $ParentPID.value
         $NewProcessObject | Add-Member -NotePropertyName 'ReadOperationCount' -NotePropertyValue $Event.Properties[9].value
         $NewProcessObject | Add-Member -NotePropertyName 'WriteOperationCount' -NotePropertyValue $Event.Properties[10].value
         $NewProcessObject | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
