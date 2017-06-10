@@ -451,6 +451,7 @@ Function Get-ETWEventLog
     # Hash table mapping of supported ETW providers to parser functions
     $script:Providers = @{
     'Microsoft-Windows-Kernel-Process' = 'KernelProcessParser'
+    'Microsoft-Windows-Kernel-Network' = 'KernelNetworkParser'
     }
 
     $Events = @{}
