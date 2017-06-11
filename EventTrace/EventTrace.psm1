@@ -524,7 +524,7 @@ Function Start-ETWForensicCollection
     $KernelNetworkConfig = New-ETWProviderConfig
     $KernelNetworkConfig.Name = $KernelNetworkName
 
-    # List of event IDs to capute
+    # List of event IDs to capture
     $IDs = @( 12 ) # IPv4 connection attempted
 
     $NetOptions = New-ETWProviderOption
