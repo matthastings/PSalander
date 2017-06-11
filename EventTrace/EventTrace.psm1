@@ -462,4 +462,88 @@ Function Get-ETWEventLog
 
     $Events.Values
 
-}
+} # Get-ETWEventLog
+
+Function Start-ETWForensicCollection
+{
+    <#
+    .SYNOPSIS
+
+    Initiates an ETW session to collect forensically significant events
+
+    .DESCRIPTION
+    
+    Start-ETWForensicCollection is a function that initiates pre-defined event tracing providers and filters. This configuration was designed to enable forensically important providers and event types.
+
+    .PARAMETER OutputFile
+
+    Location on disk where ETW events will be written. Full path should be provided.
+
+    .PARAMETER SessionName
+
+    Unique name describing the ETW session. This name will be visible from the Get-ETWSession function
+
+    .EXAMPLE
+    
+    Start-ETWForensicCollection -OutputFile C:\test\out.etl -SessionName collection
+
+    Starts ETW session named collection and captured events are writen to the path 'C:\test\out.etl'. 
+
+
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $SessionName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $OutputFile
+    )
+
+    $ProviderConfigs = @()
+
+    # Build config for kernel Process
+    $KernelProcessName = 'Microsoft-Windows-Kernel-Process'
+
+    $KernelProcessConfig = New-ETWProviderConfig
+    $KernelProcessConfig.Name = $KernelProcessName
+
+    # Only want to enable process start/stop and DLL load events
+    $ProcessRegex = '_PROCESS$|_IMAGE$'
+
+    Get-ETWProviderKeywords -ProviderName $KernelProcessConfig.Name |
+        Where-Object { $_.Name -match $ProcessRegex } |
+        ForEach-Object { $KernelProcessConfig.Keywords += $_ } 
+
+    $ProviderConfigs += $KernelProcessConfig
+
+    # Build config for network events
+    $KernelNetworkName = 'Microsoft-Windows-Kernel-Network'
+
+    $KernelNetworkConfig = New-ETWProviderConfig
+    $KernelNetworkConfig.Name = $KernelNetworkName
+
+    # List of event IDs to capute
+    $IDs = @( 12 ) # IPv4 connection attempted
+
+    $NetOptions = New-ETWProviderOption
+
+    $IDs |
+        ForEach-Object { $NetOptions.EventIDsToEnable.Add( $_ ) }
+
+    $KernelNetworkConfig.Options = $NetOptions
+
+    $ProviderConfigs += $KernelNetworkConfig
+
+    # Start ETW Session
+
+    try 
+    {
+        Start-ETWSession -SessionName $SessionName -OutputFile $OutputFile -ProviderConfig $ProviderConfigs
+    } catch {
+
+        throw "Failed to start ETW forensic collection"
+    }
+
+} # Start-ETWForensicCollection
