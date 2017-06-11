@@ -61,3 +61,21 @@ XML of image load event properties
 <Data Name='TimeDateStamp'>1468636009</Data>
 <Data Name='DefaultBase'>0x7ff7e4830000</Data>
 <Data Name='ImageName'>\Device\HarddiskVolume1\Windows\System32\dllhost.exe</Data>
+
+Provider Keywords
+
+
+Name                                              Description               Value
+----                                              -----------               -----
+WINEVENT_KEYWORD_PROCESS                                                      16
+WINEVENT_KEYWORD_THREAD                                                       32
+WINEVENT_KEYWORD_IMAGE                                                        64
+WINEVENT_KEYWORD_CPU_PRIORITY                                                128
+WINEVENT_KEYWORD_OTHER_PRIORITY                                              256
+WINEVENT_KEYWORD_PROCESS_FREEZE                                              512
+WINEVENT_KEYWORD_JOB                                                        1024
+WINEVENT_KEYWORD_ENABLE_PROCESS_TRACING_CALLBACKS                           2048
+WINEVENT_KEYWORD_JOB_IO                                                     4096
+WINEVENT_KEYWORD_WORK_ON_BEHALF                                             8192
+WINEVENT_KEYWORD_JOB_SILO                                                  16384
+Microsoft-Windows-Kernel-Process/Analytic                    9223372036854775808
