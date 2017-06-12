@@ -21,9 +21,17 @@ Function Test-IsSession
 {
     Param($SessionName)
 
-    (Get-ETWSessionNames).Contains($SessionName)
+    ( Get-ETWSessionNames ).Contains( $SessionName )
 
 } # Test-IsSession
+
+Function Test-IsProvider
+{
+    Param($ProviderName)
+
+    ( ( Get-ETWProvider ).Name ).Contains( $ProviderName )
+
+} # Test-IsProvider
 
 # End private functions
 
@@ -310,14 +318,26 @@ Function Start-ETWSession
     )
 
     BEGIN {
+        
         # Check if active session with same name already exists
         If ( (Test-IsSession -SessionName $SessionName) ) {
-            throw "$ProviderConfig.Name already exists. Cannot create again"
+
+            throw $ProviderConfig.Name + " already exists. Cannot create again"
         }
+
         # Verify either provider Name or Guid was provided
         If ( ( $ProviderConfig.Name -eq $null ) -and ($ProviderConfig.Guid -eq $null ) ) {
+
             throw "Must provide either provider name or GUID"
         }
+
+        # Check that provider name exists
+
+        If ( -Not ( $ProviderConfig.Name -eq $null ) -and -Not ( Test-IsProvider -ProviderName $ProviderConfig.Name ) ) {
+
+            Throw $ProviderConfig.Name + " is not a valid ETW Provider name"
+        }
+
         Write-Verbose "Session name set to $SessionName"
         Write-Verbose "Provider set to $ProviderName"
         $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
