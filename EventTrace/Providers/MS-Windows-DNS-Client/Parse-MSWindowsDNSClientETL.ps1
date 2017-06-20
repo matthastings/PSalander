@@ -1,42 +1,42 @@
-<#
-.SYNOPSIS
-Converts MS-Windows-DNS-Client events properties first-order object noteproperties.
-
-.DESCRIPTION
-Convert-DNSEventProperties takes an array of MS-Windows-DNS-Client events and converts the
-event properties to first-order noteproperties on the objects it returns
-
-.PARAMETER Events
-An array of MS-Windows-DNS-Client events
-
-.EXAMPLE
-$Events | Convert-DNSEventProperties | Format-List * -Force
-
-TimeCreated : 5/26/2017 10:56:53 AM
-Id          : 3008
-Message     : DNS query is completed for the name v10.vortex-win.data.microsoft.com, type 1, query options 1073766400 with status 87 Results
-Name        : v10.vortex-win.data.microsoft.com
-Type        : 1
-Options     : 1073766400
-Status      : 87
-Result      :
-
-TimeCreated        : 5/26/2017 10:56:53 AM
-Id                 : 3009
-Message            : Network query initiated for the name v10.vortex-win.data.microsoft.com (is parallel query 1) on network index 0 with
-                     interface count 1 with first interface name Ethernet0, local addresses 192.168.123.53; and Dns Servers 192.168.123.10;
-Name               : v10.vortex-win.data.microsoft.com
-isParallelQry      : 1
-NetworkIndex       : 0
-InterfaceCount     : 1
-FirstInterfaceName : Ethernet0
-LocalAddresses     : 192.168.123.53;
-DNSServers         : 192.168.123.10;
-
-.NOTES
-General notes
-#>
 function Convert-DNSEventProperties {
+    <#
+    .SYNOPSIS
+    Converts MS-Windows-DNS-Client events properties first-order object noteproperties.
+
+    .DESCRIPTION
+    Convert-DNSEventProperties takes an array of MS-Windows-DNS-Client events and converts the
+    event properties to first-order noteproperties on the objects it returns
+
+    .PARAMETER Events
+    An array of MS-Windows-DNS-Client events
+
+    .EXAMPLE
+    $Events | Convert-DNSEventProperties | Format-List * -Force
+
+    TimeCreated : 5/26/2017 10:56:53 AM
+    Id          : 3008
+    Message     : DNS query is completed for the name v10.vortex-win.data.microsoft.com, type 1, query options 1073766400 with status 87 Results
+    Name        : v10.vortex-win.data.microsoft.com
+    Type        : 1
+    Options     : 1073766400
+    Status      : 87
+    Result      :
+
+    TimeCreated        : 5/26/2017 10:56:53 AM
+    Id                 : 3009
+    Message            : Network query initiated for the name v10.vortex-win.data.microsoft.com (is parallel query 1) on network index 0 with
+                        interface count 1 with first interface name Ethernet0, local addresses 192.168.123.53; and Dns Servers 192.168.123.10;
+    Name               : v10.vortex-win.data.microsoft.com
+    isParallelQry      : 1
+    NetworkIndex       : 0
+    InterfaceCount     : 1
+    FirstInterfaceName : Ethernet0
+    LocalAddresses     : 192.168.123.53;
+    DNSServers         : 192.168.123.10;
+
+    .NOTES
+    General notes
+    #>
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [System.Diagnostics.Eventing.Reader.EventLogRecord[]]
