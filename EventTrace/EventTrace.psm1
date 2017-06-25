@@ -322,20 +322,20 @@ Function Start-ETWSession
         # Check if active session with same name already exists
         If ( (Test-IsSession -SessionName $SessionName) ) {
 
-            throw $ProviderConfig.Name + " already exists. Cannot create again"
+            throw $SessionName+ " already exists. Cannot create again"
         }
+        $ProviderConfig | ForEach-Object {
+            # Verify either provider Name or Guid was provided
+            If ( ( $_.Name -eq $null ) -and ($_.Guid -eq $null ) ) {
 
-        # Verify either provider Name or Guid was provided
-        If ( ( $ProviderConfig.Name -eq $null ) -and ($ProviderConfig.Guid -eq $null ) ) {
+                throw "Must provide either provider name or GUID"
+            }
 
-            throw "Must provide either provider name or GUID"
-        }
+            # Check that provider name exists
+            If ( -Not ( $_.Name -eq $null ) -and -Not ( Test-IsProvider -ProviderName $_.Name ) ) {
 
-        # Check that provider name exists
-
-        If ( -Not ( $ProviderConfig.Name -eq $null ) -and -Not ( Test-IsProvider -ProviderName $ProviderConfig.Name ) ) {
-
-            Throw $ProviderConfig.Name + " is not a valid ETW Provider name"
+                Throw $_.Name + " is not a valid ETW Provider name"
+            }
         }
 
         Write-Verbose "Session name set to $SessionName"
