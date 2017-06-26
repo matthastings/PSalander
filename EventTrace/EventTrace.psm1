@@ -470,8 +470,9 @@ Function Get-ETWEventLog
 
     # Hash table mapping of supported ETW providers to parser functions
     $script:Providers = @{
-    'Microsoft-Windows-Kernel-Process' = 'KernelProcessParser'
-    'Microsoft-Windows-Kernel-Network' = 'KernelNetworkParser'
+    'Microsoft-Windows-Kernel-Process'  = 'KernelProcessParser'
+    'Microsoft-Windows-Kernel-Network'  = 'KernelNetworkParser'
+    'Microsoft-Windows-Kernel-File'     = 'KernelFileParser'
     }
 
     $Events = @{}
@@ -556,6 +557,21 @@ Function Start-ETWForensicCollection
 
     $ProviderConfigs += $KernelNetworkConfig
 
+    # Build config for file events
+
+    $KernelFileName = 'Microsoft-Windows-Kernel-File'
+
+    $KernelFileConfig = New-ETWProviderConfig
+    $KernelFileConfig.Name = $KernelFileName
+
+    # Only capturing file create, write, and delete events
+    $FileRegex = "CREATE|WIRTE|DELETE"
+
+    Get-ETWProviderKeywords -ProviderName $KernelProcessConfig.Name |
+        Where-Object { $_.Name -match $FileRegex } |
+        ForEach-Object { $KernelFileConfig.Keywords += $_ } 
+
+    $ProviderConfigs += $KernelFileConfig
     # Start ETW Session
 
     try 
