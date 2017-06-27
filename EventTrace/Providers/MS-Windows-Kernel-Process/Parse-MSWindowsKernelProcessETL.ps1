@@ -38,7 +38,7 @@ function ProcessStart
 {   
     param($Event)
 
-    $ParentPID = $Event.Properties[2].value
+    $ParentPID = $Event.Properties[0].value
 
     $NewProcessObject = New-Object -TypeName psobject
     $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.Properties[0].value
