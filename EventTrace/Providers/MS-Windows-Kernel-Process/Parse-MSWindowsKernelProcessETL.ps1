@@ -85,7 +85,7 @@ function ProcessStop
         # Add new entry with random number as key
         $Events.Add( [int32]$UniqueKey, $Events[[int32]$ProcID] )
         # Delete key/value with PID
-        $Events.Remove( $Events[[int32]$ProcID] )
+        $Events.Remove( [int32]$ProcID )
 
     } 
 
