@@ -30,7 +30,7 @@ function ImageLoad
         $NewProcessObject.LoadedImages += $NewLoadImgObj
 
         $Events.Add( [int32]$ProcID, $NewProcessObject )
-    }
+    }   
 } # ImageLoad
 
 
@@ -38,7 +38,7 @@ function ProcessStart
 {   
     param($Event)
 
-    $ParentPID = $Event.Properties[0].value
+    $ParentPID = $Event.Properties[2].value
 
     $NewProcessObject = New-Object -TypeName psobject
     $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.Properties[0].value
@@ -79,6 +79,14 @@ function ProcessStop
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'WriteOperationCount' -NotePropertyValue $Event.Properties[10].value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'WriteTransferKiloBytes' -NotePropertyValue $Event.Properties[12].value
+
+        # To account for PID reuse we have to rename process keys from PID when they are complete
+        $UniqueKey = Get-Random
+        # Add new entry with random number as key
+        $Events.Add( [int32]$UniqueKey, $Events[[int32]$ProcID] )
+        # Delete key/value with PID
+        $Events.Remove( $Events[[int32]$ProcID] )
+
     } 
 
     else {
