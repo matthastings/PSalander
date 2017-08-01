@@ -20,8 +20,7 @@ function ImageLoad
 
         $Events[[int32]$ProcID].LoadedImages += $NewLoadImgObj
     }
-
-    else {
+    <#else {
 
         $NewProcessObject = New-Object -TypeName psobject
         $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $ProcID
@@ -30,24 +29,34 @@ function ImageLoad
         $NewProcessObject.LoadedImages += $NewLoadImgObj
 
         $Events.Add( [int32]$ProcID, $NewProcessObject )
-    }   
+    }#>
 } # ImageLoad
 
 
 function ProcessStart
 {   
     param($Event)
-
     $ParentPID = $Event.Properties[2].value
+    $ProcID = $Event.Properties[0].value
 
-    $NewProcessObject = New-Object -TypeName psobject
-    $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $Event.Properties[0].value
-    $NewProcessObject | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
-    $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
-    $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
-    $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
+    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[4].value
 
-    $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
+    }
+
+    else {
+        $NewProcessObject = New-Object -TypeName psobject
+        $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $ProcID
+        $NewProcessObject | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
+        $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
+        $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
+        $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[4].value
+
+        $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
+    }
 
     # Check if parent process is known and add to list
     If ( $Events.ContainsKey( [int32]$ParentPID ) ) {
@@ -66,8 +75,8 @@ function ProcessStart
 
 function ProcessStop
 {
-    param($Event)
 
+    param($Event)
     $ProcID = $Event.Properties[0].value
 
     
@@ -88,7 +97,6 @@ function ProcessStop
         $Events.Remove( [int32]$ProcID )
 
     } 
-
     else {
 
         $NewProcessObject = New-Object -TypeName psobject
@@ -101,7 +109,6 @@ function ProcessStop
 
         $Events.Add( [int32]$ProcID, $NewProcessObject )
     }
-
 }
 function KernelProcessParser
 {

@@ -52,7 +52,6 @@ function IPv4Connection
 
         }
     }
-
     else {
 
         $NewProcessObject = New-Object -TypeName psobject
