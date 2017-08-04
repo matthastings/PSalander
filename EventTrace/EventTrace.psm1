@@ -473,6 +473,7 @@ Function Get-ETWEventLog
     'Microsoft-Windows-Kernel-Process'  = 'KernelProcessParser'
     'Microsoft-Windows-Kernel-Network'  = 'KernelNetworkParser'
     'Microsoft-Windows-Kernel-File'     = 'KernelFileParser'
+    'Microsoft-Windows-DNS-Client'      = 'DNSClientParser'
     }
 
     $Events = @{}
@@ -482,7 +483,6 @@ Function Get-ETWEventLog
             &$script:Providers[$_.ProviderName] -Event $_ }
 
     $Events.Values
-
 } # Get-ETWEventLog
 
 Function Start-ETWForensicCollection
@@ -581,7 +581,8 @@ Function Start-ETWForensicCollection
     $DNSConfig.Name = $DNSClientName
 
     # List of event IDs to capture
-    $IDs = @(1002,1026,3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3018,3019,3020)
+    $IDs = @(3008)
+    # $IDs = @(1002,1026,3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3018,3019,3020)
     $DNSOptions = New-ETWProviderOption
     $IDs | ForEach-Object {
         $DNSOptions.EventIDsToEnable.Add( $_ )

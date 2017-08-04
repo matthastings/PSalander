@@ -1,0 +1,86 @@
+Get-ETWProvider | ? {$_.Name -match "kernel-file"} | % {$_.Events} | select id, keywords
+# No descriptions for this provider
+
+Id Keywords                                                  
+-- --------                                                  
+10 {, KERNEL_FILE_KEYWORD_FILENAME}                          
+11 {, KERNEL_FILE_KEYWORD_FILENAME}                          
+12 {, KERNEL_FILE_KEYWORD_CREATE, KERNEL_FILE_KEYWORD_FILEIO}
+12 {, KERNEL_FILE_KEYWORD_CREATE, KERNEL_FILE_KEYWORD_FILEIO}
+13 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+13 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+14 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+14 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+15 {, KERNEL_FILE_KEYWORD_READ, KERNEL_FILE_KEYWORD_FILEIO}  
+15 {, KERNEL_FILE_KEYWORD_READ, KERNEL_FILE_KEYWORD_FILEIO}  
+16 {, KERNEL_FILE_KEYWORD_WRITE, KERNEL_FILE_KEYWORD_FILEIO} 
+16 {, KERNEL_FILE_KEYWORD_WRITE, KERNEL_FILE_KEYWORD_FILEIO} 
+17 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+17 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+18 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+18 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+19 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+19 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+20 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+20 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+21 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+21 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+22 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+22 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+23 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+23 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+24 {, KERNEL_FILE_KEYWORD_OP_END, KERNEL_FILE_KEYWORD_FILEIO}
+25 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+25 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+26 {, KERNEL_FILE_KEYWORD_DELETE_PATH}                       
+26 {, KERNEL_FILE_KEYWORD_DELETE_PATH}                       
+27 {, KERNEL_FILE_KEYWORD_RENAME_SETLINK_PATH}               
+27 {, KERNEL_FILE_KEYWORD_RENAME_SETLINK_PATH}               
+28 {, KERNEL_FILE_KEYWORD_RENAME_SETLINK_PATH}               
+28 {, KERNEL_FILE_KEYWORD_RENAME_SETLINK_PATH}               
+29 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+29 {, KERNEL_FILE_KEYWORD_FILEIO}                            
+30 {, KERNEL_FILE_KEYWORD_CREATE_NEW_FILE}                   
+30 {, KERNEL_FILE_KEYWORD_CREATE_NEW_FILE}                   
+
+
+Get-ETWProviderKeywords -ProviderName "Microsoft-Windows-kernel-file"
+
+Name                                    Description               Value
+----                                    -----------               -----
+KERNEL_FILE_KEYWORD_FILENAME            ...                          16
+KERNEL_FILE_KEYWORD_FILEIO              ...                          32
+KERNEL_FILE_KEYWORD_OP_END              ...                          64
+KERNEL_FILE_KEYWORD_CREATE              ...                         128
+KERNEL_FILE_KEYWORD_READ                ...                         256
+KERNEL_FILE_KEYWORD_WRITE               ...                         512
+KERNEL_FILE_KEYWORD_DELETE_PATH         ...                        1024
+KERNEL_FILE_KEYWORD_RENAME_SETLINK_PATH ...                        2048
+KERNEL_FILE_KEYWORD_CREATE_NEW_FILE     ...                        4096
+Microsoft-Windows-Kernel-File/Analytic  ...         9223372036854775808
+
+
+
+
+PS Z:\workspaces\PSalander> $a | % {$_.id} | Group-Object
+
+Count Name                      Group
+----- ----                      -----
+19338 15                        {15, 15, 15, 15...}
+ 6831 12                        {12, 12, 12, 12...}
+ 6466 16                        {16, 16, 16, 16...}
+   28 30                        {30, 30, 30, 30...}
+    1 26                        {26}
+
+General Notes
+
+Event 30 tracks new files created and each event contains the process ID and file path
+
+Event 26 tracks file deletion Events
+
+
+Event 12 seems to be general calls to CreateFile (getting handle to file )
+
+Event 16 records file writes. References FileObject and not path
+In order to match this event back to file path need to first parse/track Event 12
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Kernel-File' Guid='{edd08927-9cc4-4e65-b970-c2560fb5c289}'/><EventID>16</EventID><Version>1</Version><Level>4</Level><Task>16</Task><Opcode>0</Opcode><Keywords>0x8000000000000220</Keywords><TimeCreated SystemTime='2017-06-26T01:37:12.555489800Z'/><EventRecordID>26930</EventRecordID><Correlation/><Execution ProcessID='4560' ThreadID='4372' ProcessorID='0' KernelTime='0' UserTime='1'/><Channel></Channel><Computer>DESKTOP-US5J4M3</Computer><Security/></System><EventData><Data Name='ByteOffset'>0</Data><Data Name='Irp'>0xffffc7810221e378</Data><Data Name='FileObject'>0xffffc780ff6048f0</Data><Data Name='FileKey'>0xffff96090b10ac00</Data><Data Name='IssuingThreadId'>4372</Data><Data Name='IOSize'>9</Data><Data Name='IOFlags'>395776</Data><Data Name='ExtraFlags'>0</Data></EventData></Event>

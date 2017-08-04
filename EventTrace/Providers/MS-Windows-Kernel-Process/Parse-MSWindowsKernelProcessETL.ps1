@@ -20,7 +20,7 @@ function ImageLoad
 
         $Events[[int32]$ProcID].LoadedImages += $NewLoadImgObj
     }
-    <#else {
+    else {
 
         $NewProcessObject = New-Object -TypeName psobject
         $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $ProcID
@@ -29,7 +29,7 @@ function ImageLoad
         $NewProcessObject.LoadedImages += $NewLoadImgObj
 
         $Events.Add( [int32]$ProcID, $NewProcessObject )
-    }#>
+    }
 } # ImageLoad
 
 
@@ -43,7 +43,7 @@ function ProcessStart
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
         $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[4].value
+        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
     }
 
@@ -53,7 +53,7 @@ function ProcessStart
         $NewProcessObject | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
         $NewProcessObject | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
         $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
-        $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[4].value
+        $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
         $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
     }
