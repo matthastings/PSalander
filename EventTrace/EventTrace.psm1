@@ -362,10 +362,13 @@ Function Start-ETWSession
             # Keywords are used to filter what events are captured during an ETW session and are calculated via a bitmask
             # Adding the value for the enables to correct events. If keywords are not provided no event filters are used
             If ( $_.Keywords ) {
+                write-host "MADE IT"
                 $MatchAnyKeywords = $_.Keywords | ForEach-Object { $_.Value } | Measure-Object -Sum | Select-Object -ExpandProperty sum
             } else {
                 $MatchAnyKeywords = [uint64]::MaxValue
             }
+
+            $MatchAnyKeywords
 
             # Determine if provider should be enabled by GUID or name
 
@@ -567,9 +570,10 @@ Function Start-ETWForensicCollection
     $KernelFileConfig.Name = $KernelFileName
 
     # Only capturing file create, write, and delete events
-    $FileRegex = "CREATE|WRITE|DELETE"
+    $FileRegex = "CREATE|DELETE"
+        # $FileRegex = "CREATE|WRITE|DELETE"
 
-    Get-ETWProviderKeywords -ProviderName $KernelProcessConfig.Name |
+    Get-ETWProviderKeywords -ProviderName $KernelFileConfig.Name |
         Where-Object { $_.Name -match $FileRegex } |
         ForEach-Object { $KernelFileConfig.Keywords += $_ } 
 
@@ -581,7 +585,7 @@ Function Start-ETWForensicCollection
     $DNSConfig.Name = $DNSClientName
 
     # List of event IDs to capture
-    $IDs = @(3000)
+    $IDs = @(3000, 3008)
     # $IDs = @(1002,1026,3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3018,3019,3020)
     $DNSOptions = New-ETWProviderOption
     $IDs | ForEach-Object {
