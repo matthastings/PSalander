@@ -505,6 +505,10 @@ Function Start-ETWForensicCollection
 
     Unique name describing the ETW session. This name will be visible from the Get-ETWSession function
 
+    .PARAMETER EnableVerbose
+
+    Enables verbose event capture (ex. all file writes). Should only be enabled for short event captures.
+
     .EXAMPLE
     
     Start-ETWForensicCollection -OutputFile C:\test\out.etl -SessionName collection
@@ -520,7 +524,11 @@ Function Start-ETWForensicCollection
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutputFile
+        $OutputFile,
+
+        [Parameter(Mandatory=$False)]
+        [boolean]
+        $EnableVerbose = $false
     )
 
     $ProviderConfigs = @()
@@ -567,9 +575,11 @@ Function Start-ETWForensicCollection
     $KernelFileConfig.Name = $KernelFileName
 
     # Only capturing file create, write, and delete events
-    $FileRegex = "CREATE|DELETE"
-        # $FileRegex = "CREATE|WRITE|DELETE"
-
+    If ( $EnableVerbose ) {
+         $FileRegex = "CREATE|WRITE|DELETE"
+    }
+    else { $FileRegex = "CREATE|DELETE" }
+    
     Get-ETWProviderKeywords -ProviderName $KernelFileConfig.Name |
         Where-Object { $_.Name -match $FileRegex } |
         ForEach-Object { $KernelFileConfig.Keywords += $_ } 
