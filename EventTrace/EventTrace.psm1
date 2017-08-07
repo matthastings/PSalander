@@ -540,7 +540,7 @@ Function Start-ETWForensicCollection
     $KernelProcessConfig.Name = $KernelProcessName
 
     # Only want to enable process start/stop and DLL load events
-    $ProcessRegex = '_PROCESS$|_IMAGE$'
+    $ProcessRegex = '_PROCESS$|_IMAGE$|_THREAD$'
 
     Get-ETWProviderKeywords -ProviderName $KernelProcessConfig.Name |
         Where-Object { $_.Name -match $ProcessRegex } |
