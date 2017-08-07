@@ -1,3 +1,74 @@
+function ConvertTo-Hex
+{
+    param($DecInt)
+    
+    "0x{0:X}" -f $DecInt
+}
+
+
+function ThreadStart
+{
+    param($Event)
+
+    $ProcID = $Event.Properties[0].value
+
+    # Thread property descriptions found at https://msdn.microsoft.com/fr-fr/dd765166
+    $NewThread = New-Object -TypeName psobject
+    $NewThread | Add-Member -NotePropertyName 'ThreadID' -NotePropertyValue $Event.Properties[1].value 
+    $NewThread | Add-Member -NotePropertyName 'StackBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[2].value)
+    $NewThread | Add-Member -NotePropertyName 'StackLimit' -NotePropertyValue (ConvertTo-Hex $Event.Properties[3].value)
+    $NewThread | Add-Member -NotePropertyName 'UserStackBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[4].value)
+    $NewThread | Add-Member -NotePropertyName 'UserStackLimit' -NotePropertyValue (ConvertTo-Hex $Event.Properties[5].value)
+    $NewThread | Add-Member -NotePropertyName 'StartAddr' -NotePropertyValue (ConvertTo-Hex $Event.Properties[6].value)
+    $NewThread | Add-Member -NotePropertyName 'Win32StartAddr' -NotePropertyValue (ConvertTo-Hex $Event.Properties[7].value) 
+    $NewThread | Add-Member -NotePropertyName 'TeBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[8].value)
+    $NewThread | Add-Member -NotePropertyName 'SubProcessTag' -NotePropertyValue $Event.Properties[9].value
+    $NewThread | Add-Member -NotePropertyName 'ThreadStartTime' -NotePropertyValue $Event.TimeCreated
+
+
+    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+
+        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'Threads').Count -lt 1 ) {
+            
+            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'Threads' -NotePropertyValue @()
+
+        }
+
+        $Events[[int32]$ProcID].Threads += $NewThread
+    }
+    else {
+
+        $NewProcessObject = New-Object -TypeName psobject
+        $NewProcessObject | Add-Member -NotePropertyName 'ProcessID' -NotePropertyValue $ProcID
+        $NewProcessObject | Add-Member -NotePropertyName 'Threads' -NotePropertyValue @()
+
+        $NewProcessObject.Threads += $NewThread
+
+        $Events.Add( [int32]$ProcID, $NewProcessObject )
+    }
+} # ThreadStart
+
+
+function ThreadStop
+{
+    param($Event)
+
+    $ProcID = $Event.Properties[0].value
+    $ThreadID = $Event.Properties[1].value
+
+     If ( $Events.ContainsKey( [int32]$ProcID ) -and ($Events[[int32]$ProcID].Threads).ThreadID -contains $ThreadID ) {
+
+        $Events[[int32]$ProcId].Threads |
+            Where-Object {$_.ThreadID -eq $ThreadID} |
+            ForEach-Object {
+                $_ | Add-Member -NotePropertyName 'ThreadEndTime' -NotePropertyValue $Event.TimeCreated
+                # The number of CPU clock cycles used by the thread. This value includes cycles spent in both user mode and kernel mode.
+                # Found at https://msdn.microsoft.com/en-us/library/windows/desktop/ms684943(v=vs.85).aspx
+                $_ | Add-Member -NotePropertyName 'CycleTime' -NotePropertyValue $Event.Properties[10].value 
+        }
+     }
+} # ThreadStop
+
 function ImageLoad
 {
     param($Event)
@@ -123,6 +194,8 @@ function KernelProcessParser
     $script:KernProcEvents = @{
         1 = 'ProcessStart'
         2 = 'ProcessStop'
+        3 = 'ThreadStart'
+        4 = 'ThreadStop'
         6 = 'ImageLoad'
     }
 
