@@ -10,7 +10,7 @@ function ThreadStart
 {
     param($Event)
 
-    $ProcID = $Event.Properties[0].value
+    $ProcID = [int32]$Event.Properties[0].value
 
     # Thread property descriptions found at https://msdn.microsoft.com/fr-fr/dd765166
     $NewThread = New-Object -TypeName psobject
@@ -21,20 +21,20 @@ function ThreadStart
     $NewThread | Add-Member -NotePropertyName 'UserStackLimit' -NotePropertyValue (ConvertTo-Hex $Event.Properties[5].value)
     $NewThread | Add-Member -NotePropertyName 'StartAddr' -NotePropertyValue (ConvertTo-Hex $Event.Properties[6].value)
     $NewThread | Add-Member -NotePropertyName 'Win32StartAddr' -NotePropertyValue (ConvertTo-Hex $Event.Properties[7].value) 
-    $NewThread | Add-Member -NotePropertyName 'TeBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[8].value)
+    $NewThread | Add-Member -NotePropertyName 'TebBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[8].value)
     $NewThread | Add-Member -NotePropertyName 'SubProcessTag' -NotePropertyValue $Event.Properties[9].value
     $NewThread | Add-Member -NotePropertyName 'ThreadStartTime' -NotePropertyValue $Event.TimeCreated
 
 
-    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+    If ( $Events.ContainsKey( $ProcID ) ) {
 
-        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'Threads').Count -lt 1 ) {
+        If ( ($Events[$ProcID].PSObject.Properties.Name -match 'Threads').Count -lt 1 ) {
             
-            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'Threads' -NotePropertyValue @()
+            $Events[$ProcID] | Add-Member -NotePropertyName 'Threads' -NotePropertyValue @()
 
         }
 
-        $Events[[int32]$ProcID].Threads += $NewThread
+        $Events[$ProcID].Threads += $NewThread
     }
     else {
 
@@ -44,7 +44,7 @@ function ThreadStart
 
         $NewProcessObject.Threads += $NewThread
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
 } # ThreadStart
 
@@ -53,12 +53,12 @@ function ThreadStop
 {
     param($Event)
 
-    $ProcID = $Event.Properties[0].value
+    $ProcID = [int32]$Event.Properties[0].value
     $ThreadID = $Event.Properties[1].value
 
      If ( $Events.ContainsKey( [int32]$ProcID ) -and ($Events[[int32]$ProcID].Threads).ThreadID -contains $ThreadID ) {
 
-        $Events[[int32]$ProcId].Threads |
+        $Events[$ProcId].Threads |
             Where-Object {$_.ThreadID -eq $ThreadID} |
             ForEach-Object {
                 $_ | Add-Member -NotePropertyName 'ThreadEndTime' -NotePropertyValue $Event.TimeCreated
@@ -73,23 +73,23 @@ function ImageLoad
 {
     param($Event)
 
-    $ProcID = $Event.Properties[2].value
+    $ProcID = [int32]$Event.Properties[2].value
 
     $NewLoadImgObj = New-Object -TypeName psobject
-    $NewLoadImgObj | Add-Member -NotePropertyName 'ImageBase' -NotePropertyValue $Event.Properties[0].value
-    $NewLoadImgObj | Add-Member -NotePropertyName 'ImageSize' -NotePropertyValue $Event.Properties[1].value
+    $NewLoadImgObj | Add-Member -NotePropertyName 'ImageBase' -NotePropertyValue (ConvertTo-Hex $Event.Properties[0].value)
+    $NewLoadImgObj | Add-Member -NotePropertyName 'ImageSize' -NotePropertyValue (ConvertTo-Hex $Event.Properties[1].value)
     $NewLoadImgObj | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[6].value
 
 
-    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+    If ( $Events.ContainsKey( $ProcID ) ) {
 
-        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'LoadedImages').Count -lt 1 ) {
+        If ( ($Events[$ProcID].PSObject.Properties.Name -match 'LoadedImages').Count -lt 1 ) {
             
-            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'LoadedImages' -NotePropertyValue @()
+            $Events[$ProcID] | Add-Member -NotePropertyName 'LoadedImages' -NotePropertyValue @()
+
 
         }
-
-        $Events[[int32]$ProcID].LoadedImages += $NewLoadImgObj
+        $Events[$ProcID].LoadedImages += $NewLoadImgObj
     }
     else {
 
@@ -99,22 +99,37 @@ function ImageLoad
 
         $NewProcessObject.LoadedImages += $NewLoadImgObj
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
+
+    # Add image load to corresponding process thread
+    # Need to calculate image end address 
+    $ImageEndAddr = ConvertTo-Hex ([uint64]$NewLoadImgObj.ImageBase + [uint64]$NewLoadImgObj.ImageSize)
+    $Events[$ProcId].Threads |
+        # Verify loadedimage property does not already exist
+        Where-Object { ($_.PSObject.Properties.Name -match 'LoadedImage').Count -lt 1 } | 
+        # Verify the thread start address is between the image load and end addresses
+        Where-Object { ( [uint64]$_.Win32StartAddr -gt [uint64]$NewLoadImgObj.ImageBase) -and ([uint64]$_.Win32StartAddr -lt [uint64]$ImageEndAddr) } |
+        ForEach-Object { 
+            $_ | Add-Member -NotePropertyName 'LoadedImage' -NotePropertyValue $NewLoadImgObj.ImageName 
+            $_ | Add-Member -NotePropertyName 'ImageBase' -NotePropertyValue $NewLoadImgObj.ImageBase            
+            $_ | Add-Member -NotePropertyName 'ImageSize' -NotePropertyValue $NewLoadImgObj.ImageSize
+        }
+
 } # ImageLoad
 
 
 function ProcessStart
 {   
     param($Event)
-    $ParentPID = $Event.Properties[2].value
-    $ProcID = $Event.Properties[0].value
+    $ParentPID = [int32]$Event.Properties[2].value
+    $ProcID = [int32]$Event.Properties[0].value
 
     If ( $Events.ContainsKey( [int32]$ProcID ) ) {
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'CreateTime' -NotePropertyValue $Event.Properties[1].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'ParentPID' -NotePropertyValue $ParentPID
+        $Events[$ProcID] | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
     }
 
@@ -126,20 +141,20 @@ function ProcessStart
         $NewProcessObject | Add-Member -NotePropertyName 'SessionID' -NotePropertyValue $Event.Properties[3].value
         $NewProcessObject | Add-Member -NotePropertyName 'ImageName' -NotePropertyValue $Event.Properties[5].value
 
-        $Events.Add( [int32]$Event.Properties[0].value, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
 
     # Check if parent process is known and add to list
-    If ( $Events.ContainsKey( [int32]$ParentPID ) ) {
+    If ( $Events.ContainsKey( $ParentPID ) ) {
 
         # Check if property has been added and if not then add
-         If ( ($Events[ [int32]$ParentPID ].PSObject.Properties.Name -match 'ChildProcesses').Count -lt 1 ) {
+         If ( ($Events[ $ParentPID ].PSObject.Properties.Name -match 'ChildProcesses').Count -lt 1 ) {
 
-            $Events[ [int32]$ParentPID ] | Add-Member -NotePropertyName 'ChildProcesses' -NotePropertyValue @()
+            $Events[ $ParentPID ] | Add-Member -NotePropertyName 'ChildProcesses' -NotePropertyValue @()
 
         }
 
-        $Events[ [int32]$ParentPID ].ChildProcesses += $NewProcessObject
+        $Events[ $ParentPID ].ChildProcesses += $NewProcessObject
     }
     
 } # ProcessStart
@@ -148,24 +163,24 @@ function ProcessStop
 {
 
     param($Event)
-    $ProcID = $Event.Properties[0].value
+    $ProcID = [int32]$Event.Properties[0].value
 
     
 
-    If ( $Events.ContainsKey( [int32]$ProcId ) ) {
+    If ( $Events.ContainsKey( $ProcId ) ) {
 
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $Event.Properties[2].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ReadOperationCount' -NotePropertyValue $Event.Properties[9].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'WriteOperationCount' -NotePropertyValue $Event.Properties[10].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
-        $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'WriteTransferKiloBytes' -NotePropertyValue $Event.Properties[12].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'EndTime' -NotePropertyValue $Event.Properties[2].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'ReadOperationCount' -NotePropertyValue $Event.Properties[9].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'WriteOperationCount' -NotePropertyValue $Event.Properties[10].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
+        $Events[$ProcID] | Add-Member -NotePropertyName 'WriteTransferKiloBytes' -NotePropertyValue $Event.Properties[12].value
 
         # To account for PID reuse we have to rename process keys from PID when they are complete
         $UniqueKey = Get-Random
         # Add new entry with random number as key
-        $Events.Add( [int32]$UniqueKey, $Events[[int32]$ProcID] )
+        $Events.Add( [int32]$UniqueKey, $Events[$ProcID] )
         # Delete key/value with PID
-        $Events.Remove( [int32]$ProcID )
+        $Events.Remove( $ProcID )
 
     } 
     else {
@@ -178,7 +193,7 @@ function ProcessStop
         $NewProcessObject | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
         $NewProcessObject | Add-Member -NotePropertyName 'WriteTransferKiloBytes' -NotePropertyValue $Event.Properties[12].value
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
 }
 function KernelProcessParser

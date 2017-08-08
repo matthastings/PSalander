@@ -6,24 +6,33 @@ function Win10DNSResponse
     # Only type 28 responses contain domain to IP mappings
     If ( $Event.Properties[1].value -eq 28 -and $Event.Properties[4].value -match $IPRegex ) {
 
-        $ProcID = $Event.ProcessID
+        $ProcID = [int32]$Event.ProcessID
         
         $IPAddress = $matches[0]
         
         $NewDNSObject = New-Object -TypeName psobject
         $NewDNSObject | Add-Member -NotePropertyName 'DomainName' -NotePropertyValue $Event.Properties[0].value
         $NewDNSObject | Add-Member -NotePropertyName 'IPv4Address' -NotePropertyValue $IPAddress
+        $NewDNSObject | Add-Member -NotePropertyName 'ThreadID' -NotePropertyValue $Event.ThreadID
 
+        If ( $Events.ContainsKey( $ProcID ) ) {
 
-        If ( $Events.ContainsKey( [int32]$ProcID ) ) {
-
-            If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
+            If ( ($Events[$ProcID].PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
                 
-                $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
+                $Events[$ProcID] | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
 
             }
 
-            $Events[ [int32]$ProcID ].DomainLookups += $NewDNSObject
+            $Events[ $ProcID ].DomainLookups += $NewDNSObject
+
+            $Events[$ProcID].Threads | 
+                Where-Object { $_.threadID -eq $Event.ThreadID } |
+                ForEach-Object {
+                    If ( ($_.PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
+                        $_ | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
+                    }
+                    $_.DomainLookups += $NewDNSObject
+            }
 
         }
 
@@ -34,7 +43,7 @@ function Win10DNSResponse
 
             $NewProcessObject.DomainLookups += $NewDNSObject
 
-            $Events.Add( [int32]$ProcID, $NewProcessObject )
+            $Events.Add( $ProcID, $NewProcessObject )
         }
     }
 
@@ -45,20 +54,29 @@ function Win2012DNSResponse
     param($Event)
 
 
-    $ProcID = $Event.ProcessID
+    $ProcID = [int32]$Event.ProcessID
     
     $NewDNSObject = New-Object -TypeName psobject
     $NewDNSObject | Add-Member -NotePropertyName 'DomainName' -NotePropertyValue $Event.Properties[0].value
 
     If ( $Events.ContainsKey( [int32]$ProcID ) ) {
 
-        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
+        If ( ($Events[$ProcID].PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
             
-            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
+            $Events[$ProcID] | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
 
         }
 
-        $Events[ [int32]$ProcID ].DomainLookups += $NewDNSObject
+        $Events[ $ProcID ].DomainLookups += $NewDNSObject
+
+        $Events[$ProcID].Threads | 
+            Where-Object { $_.threadID -eq $Event.ThreadID } |
+            ForEach-Object {
+                If ( ($_.PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
+                    $_ | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
+                }
+                $_.FileIO += $NewDNSObject
+            }
 
     }
 
@@ -69,7 +87,7 @@ function Win2012DNSResponse
 
         $NewProcessObject.DomainLookups += $NewDNSObject
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
 
 }

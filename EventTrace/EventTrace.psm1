@@ -348,7 +348,7 @@ Function Start-ETWSession
         $options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSessionOptions
         $options.Create
         # Create ETW session
-        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $OutputFile, $options)
+        $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $path, $options)
         # Setting StopOnDispose to false will not end a session if powershell ends
         $session.StopOnDispose = $false
 

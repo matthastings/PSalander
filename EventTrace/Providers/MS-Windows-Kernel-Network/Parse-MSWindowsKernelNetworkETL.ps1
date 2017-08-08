@@ -2,7 +2,7 @@ function IPv4Connection
 {
     param($Event)
 
-    $ProcID = $Event.Properties[0].value
+    $ProcID = [int32]$Event.Properties[0].value
 
     $DestIP = [System.Net.IPAddress]$Event.Properties[2].value
 
@@ -23,34 +23,58 @@ function IPv4Connection
     $NewNetworkObj = New-Object -TypeName psobject
     $NewNetworkObj | Add-Member -NotePropertyName 'DestinationIP' -NotePropertyValue $DestIP.IPAddressToString
     $NewNetworkObj | Add-Member -NotePropertyName 'DestinationPort' -NotePropertyValue $DestPort
+    $NewNetworkObj | Add-Member -NotePropertyName 'ThreadID' -NotePropertyValue $Event.ThreadID
     $NewNetworkObj | Add-Member -NotePropertyName 'Count' -NotePropertyValue 1
 
 
-    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+    If ( $Events.ContainsKey( $ProcID ) ) {
 
-        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'NetConnections').Count -lt 1 ) {
+        If ( ($Events[$ProcID].PSObject.Properties.Name -match 'NetConnections').Count -lt 1 ) {
             
-            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'NetConnections' -NotePropertyValue @()
+            $Events[$ProcID] | Add-Member -NotePropertyName 'NetConnections' -NotePropertyValue @()
 
         }
 
         # This will only add connection if an identical one (port and IP) has not already been added
 
-        $found =  $Events[ [int32]$ProcID ].NetConnections | 
-            Where-Object { $_.DestinationIP -eq $NewNetworkObj.DestinationIP -and $_.DestinationPort -eq $NewNetworkObj.DestinationPort } |
+        $found =  $Events[ $ProcID ].NetConnections | 
+            Where-Object { $_.DestinationIP -eq $NewNetworkObj.DestinationIP -and $_.DestinationPort -eq $NewNetworkObj.DestinationPort -and $_.ThreadID -eq $NewNetworkObj.ThreadID } |
             ForEach-Object { $true }
+
+        # Add netork threading object if not there 
+        $Events[$ProcID].Threads | 
+            Where-Object { $_.threadID -eq $Event.ThreadID } |
+            ForEach-Object {
+                If ( ($_.PSObject.Properties.Name -match 'NetConnections').Count -lt 1 ) {
+                    $_ | Add-Member -NotePropertyName 'NetConnections' -NotePropertyValue @()
+                }
+            }
         
 
         If ( -Not $found ) {
 
-            $Events[ [int32]$ProcID ].NetConnections += $NewNetworkObj
+            $Events[ $ProcID ].NetConnections += $NewNetworkObj
+            
+            $Events[$ProcID].Threads | 
+                Where-Object { $_.threadID -eq $Event.ThreadID } |
+                ForEach-Object { $_.NetConnections += $NewNetworkObj }
+ 
         } else {
             # If connection does exist increment count by 1
-            $Events[ [int32]$ProcID ].NetConnections | 
-            Where-Object { $_.DestinationIP -eq $NewNetworkObj.DestinationIP -and $_.DestinationPort -eq $NewNetworkObj.DestinationPort } |
-            ForEach-Object { $_.Count = $_.Count + 1 } 
+            $Events[ $ProcID ].NetConnections | 
+                Where-Object { $_.DestinationIP -eq $NewNetworkObj.DestinationIP -and $_.DestinationPort -eq $NewNetworkObj.DestinationPort -and $_.ThreadID -eq $NewNetworkObj.ThreadID } |
+                ForEach-Object { $_.Count = $_.Count + 1 } 
+
+            # Increment thread counter by 1
+            $Events[$ProcID].Threads | 
+                Where-Object { $_.threadID -eq $Event.ThreadID } |
+                Where-Object { ($_.NetConnections).DestinationIP -eq $NewNetworkObj.DestinationIP -and `
+                     ($_.NetConnections).DestinationPort -eq $NewNetworkObj.DestinationPort } |
+                ForEach-Object { ($_.NetConnections).Count +=1 }
+
 
         }
+
     }
     else {
 
@@ -60,7 +84,7 @@ function IPv4Connection
 
         $NewProcessObject.NetConnections += $NewNetworkObj
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
     }
 } # IPv4Connection
 

@@ -22,7 +22,7 @@ function FileWrite
     # Confirm file object is known
     If ( $OpenFiles.ContainsKey( $FileID ) ) {
         
-        $ProcID = $Event.ProcessId
+        $ProcID = [int32]$Event.ProcessId
         $BytesWrite = $Event.Properties[5].value
         $Action = "WRITE"
 
@@ -31,16 +31,26 @@ function FileWrite
         $NewFileObj | Add-Member -NotePropertyName 'FilePath' -NotePropertyValue $OpenFiles[ $FileID ]
         $NewFileObj | Add-Member -NotePropertyName 'Action' -NotePropertyValue $Action
         $NewFileObj | Add-Member -NotePropertyName 'BytesWritten' -NotePropertyValue $BytesWrite
+        $NewFileObj | Add-Member -NotePropertyName 'ThreadID' -NotePropertyValue $Event.ThreadID
 
-        If ( $Events.ContainsKey( [int32]$ProcID ) ) {
+        If ( $Events.ContainsKey( $ProcID ) ) {
 
-            If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
+            If ( ($Events[$ProcID].PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
                 
-                $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
+                $Events[$ProcID] | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
 
             }
 
-            $Events[[int32]$ProcID].FileIO += $NewFileObj
+            $Events[$ProcID].FileIO += $NewFileObj
+
+            $Events[$ProcID].Threads | 
+                Where-Object { $_.threadID -eq $Event.ThreadID } |
+                ForEach-Object {
+                    If ( ($_.PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
+                        $_ | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
+                    }
+                    $_.FileIO += $NewFileObj
+            }
         }
         else {
             $NewProcessObject = New-Object -TypeName psobject
@@ -49,13 +59,10 @@ function FileWrite
 
             $NewProcessObject.FileIO += $NewFileObj
 
-            $Events.Add( [int32]$ProcID, $NewProcessObject )
+            $Events.Add( $ProcID, $NewProcessObject )
 
         }
     }
-    
-    # If we can't map the open handle then there is no way to identify the file path
-    else {}
     
 } # FileWrite
 
@@ -63,7 +70,7 @@ function FileCreateDelete
 {
     param($Event)
 
-    $ProcID = $Event.ProcessId
+    $ProcID = [int32]$Event.ProcessId
     $FilePath = $Event.Properties[6].value
 
     If ( $Event.Id -eq 26 ) {
@@ -78,16 +85,26 @@ function FileCreateDelete
 
     $NewFileObj | Add-Member -NotePropertyName 'FilePath' -NotePropertyValue $FilePath
     $NewFileObj | Add-Member -NotePropertyName 'Action' -NotePropertyValue $Action
+    $NewFileObj | Add-Member -NotePropertyName 'ThreadID' -NotePropertyValue $Event.ThreadID
 
-    If ( $Events.ContainsKey( [int32]$ProcID ) ) {
 
-        If ( ($Events[[int32]$ProcID].PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
+    If ( $Events.ContainsKey( $ProcID ) ) {
+
+        If ( ($Events[$ProcID].PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
             
-            $Events[[int32]$ProcID] | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
+            $Events[$ProcID] | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
 
         }
-
-        $Events[[int32]$ProcID].FileIO += $NewFileObj
+        $Events[$ProcID].FileIO += $NewFileObj
+        
+        $Events[$ProcID].Threads | 
+            Where-Object { $_.threadID -eq $Event.ThreadID } |
+            ForEach-Object {
+                If ( ($_.PSObject.Properties.Name -match 'FileIO').Count -lt 1 ) {
+                    $_ | Add-Member -NotePropertyName 'FileIO' -NotePropertyValue @()
+                }
+                $_.FileIO += $NewFileObj
+            }
     }
     else {
         $NewProcessObject = New-Object -TypeName psobject
@@ -96,9 +113,10 @@ function FileCreateDelete
 
         $NewProcessObject.FileIO += $NewFileObj
 
-        $Events.Add( [int32]$ProcID, $NewProcessObject )
+        $Events.Add( $ProcID, $NewProcessObject )
 
     }
+
 
 } # FileCreateDelete
 
