@@ -75,7 +75,7 @@ function Win2012DNSResponse
                 If ( ($_.PSObject.Properties.Name -match 'DomainLookups').Count -lt 1 ) {
                     $_ | Add-Member -NotePropertyName 'DomainLookups' -NotePropertyValue @()
                 }
-                $_.FileIO += $NewDNSObject
+                $_.DomainLookups += $NewDNSObject
             }
 
     }
