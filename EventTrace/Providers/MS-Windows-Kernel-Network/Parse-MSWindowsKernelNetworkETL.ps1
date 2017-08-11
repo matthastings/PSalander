@@ -70,7 +70,9 @@ function IPv4Connection
                 Where-Object { $_.threadID -eq $Event.ThreadID } |
                 Where-Object { ($_.NetConnections).DestinationIP -eq $NewNetworkObj.DestinationIP -and `
                      ($_.NetConnections).DestinationPort -eq $NewNetworkObj.DestinationPort } |
-                ForEach-Object { ($_.NetConnections).Count +=1 }
+                ForEach-Object { $_.NetConnections } |
+                ForEach-Object {$_.Count = $_.Count + 1}
+                
 
 
         }
