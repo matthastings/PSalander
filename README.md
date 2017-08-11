@@ -12,7 +12,7 @@ PSalander is a PowerShell project that enables users to easily interact with Eve
 ### Starting Forensic Collection with PSalander
 INSERT EXAMPLES of starting and parsing etw providers
 
-### Parsing any .ETL Log
+### Parse any .ETL Log
 
 ```Get-WinEvent -Path <path to ETL file> -Oldest```
 
@@ -33,4 +33,4 @@ https://blogs.technet.microsoft.com/office365security/hidden-treasure-intrusion-
 ## Referenced Work
 
 - Module design for PSalander was heavily influenced by [CimSweep](https://github.com/PowerShellMafia/CimSweep). It should be a model for all PS modules follow.
-- Zak Brown and the Microsoft OS365 folks have done great ETW work and have their own open source ETW library [krabsetw](https://github.com/microsoft/krabsetw)
+- Zak Brown and the Microsoft OS365 folks do great ETW work and have their own open source ETW library [krabsetw](https://github.com/microsoft/krabsetw)
