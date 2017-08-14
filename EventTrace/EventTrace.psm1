@@ -390,6 +390,63 @@ Function Start-ETWSession
 
 } # Start-ETWSession
 
+Function Start-ETWKernelSession
+{
+    <#
+    .SYNOPSIS
+    
+    Enables Windows Kernel ETW Provider
+
+    .DESCRIPTION
+    
+    In ETW there is a special provider to get certain events from the Windows kernel. In some earlier Windows versions (Win7 and 2008R2) there is only one allowed kernel session with a static name.
+    More recent versions allow for multiple sessions and multiple session names.
+
+    .PARAMETER OutputFile
+    
+    Location on disk where Kernel ETW events will be written. Full path should be provided.
+    
+    .PARAMETER SessionName 
+    
+    Optional parameter to define a unique Kernel session name. On Win7 and 2008R2 this name has be to "NT Kernel Logger", which is the configured default value.
+    The default value will work on modern Windows operating systems, but may cause issues if another session with the same name already exists.
+
+    .EXAMPLE
+
+    Start-ETWKernelSession -OutputFile .\kernel_events.etl
+
+    This will start the kernel ETW provider, register a new sessin with the default name "NT Kernel Logger" and write output to the file "kernel_events.etl"
+
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $OutputFile,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $SessionName = [Microsoft.Diagnostics.Tracing.Parsers.KernelTraceEventParser]::KernelSessionName
+    )
+
+    # For kernel events we are mostly concerned with Process events
+    $Process = 0x00000001
+
+    $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
+
+    # Create ETW session options
+    $options = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSessionOptions
+    $options.Create
+
+    $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $path)
+    
+    $session.StopOnDispose = $false
+    # Starts kernel session filtered to only collect process events
+    $session.EnableKernelProvider($Process) 
+
+} # Start-ETWKernelSession
+
+
 Function Stop-ETWSession {
     <#
     .SYNOPSIS
@@ -404,6 +461,11 @@ Function Stop-ETWSession {
 
     Name of valid ETW Session
 
+    .PARAMETER StopKernelSession
+
+    Boolean parameter to also stop the default kernel provider session. Only works if kernel session name is "NT Kernel Logger"
+
+
     .EXAMPLE
 
     Stop-ETWSession ProcessMonitor
@@ -416,7 +478,13 @@ Function Stop-ETWSession {
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [string]
-        $SessionName
+        $SessionName,
+
+        [Parameter(Mandatory=$false)]
+        [switch]
+        $StopKernelSession = $false
+
+
     )
 
     BEGIN {
@@ -432,6 +500,13 @@ Function Stop-ETWSession {
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, "", $options)
         # Stop session
         $session.stop()
+
+        If ($StopKernelSession) {
+            $KernelName = "NT Kernel Logger"
+            $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($KernelName, "", $options)
+            # Stop session
+            $session.stop()
+        }
     }
 
 } # Stop-ETWSession
@@ -482,6 +557,17 @@ Function Get-ETWEventLog
         $script:Providers.ContainsKey($_.ProviderName) } | ForEach-Object {
             &$script:Providers[$_.ProviderName] -Event $_ }
 
+    # Check if kernel output exists
+
+    $KernelSessPath = -join([IO.Path]::GetFileNameWithoutExtension($Path) + "_kernelsession" + [IO.Path]::GetExtension($Path))
+    If ( Test-Path $KernelSessPath )  {
+
+        Get-WinEvent -Path $KernelSessPath -Oldest |
+            # Filter out any event that does not contain command line in eventpayload
+            Where-Object  { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -match "^80" } |
+            ForEach-Object { KernelSessionParser -EventPayload (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1] }
+    }
+
     $Events.Values
 } # Get-ETWEventLog
 
@@ -509,6 +595,10 @@ Function Start-ETWForensicCollection
 
     Enables verbose event capture (ex. all file writes). Should only be enabled for short event captures.
 
+    .PARAMETER DisableKernelProvider
+
+    Disables kernel session during forensic capture. Disabling this provider results in command lines not being captured.
+
     .EXAMPLE
     
     Start-ETWForensicCollection -OutputFile C:\test\out.etl -SessionName collection
@@ -527,9 +617,17 @@ Function Start-ETWForensicCollection
         $OutputFile,
 
         [Parameter(Mandatory=$False)]
-        [boolean]
-        $EnableVerbose = $false
+        [switch]
+        $EnableVerbose = $false,
+
+        [Parameter(Mandatory=$False)]
+        [switch]
+        $DisableKernelProvider = $false
+
     )
+
+    # Resolve full path of output file
+    $OutputFile = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
 
     $ProviderConfigs = @()
 
@@ -593,7 +691,6 @@ Function Start-ETWForensicCollection
 
     # List of event IDs to capture
     $IDs = @(3000, 3008)
-    # $IDs = @(1002,1026,3000,3001,3002,3003,3004,3005,3006,3007,3008,3009,3010,3011,3012,3013,3014,3015,3016,3018,3019,3020)
     $DNSOptions = New-ETWProviderOption
     $IDs | ForEach-Object {
         $DNSOptions.EventIDsToEnable.Add( $_ )
@@ -607,10 +704,27 @@ Function Start-ETWForensicCollection
 
     try 
     {
+        "Starting ETW forensic collection. Output will be written to: " + $OutputFile
+
         Start-ETWSession -SessionName $SessionName -OutputFile $OutputFile -ProviderConfig $ProviderConfigs
     } catch {
 
         throw "Failed to start ETW forensic collection"
+    }
+
+    If (-not $DisableKernelProvider) {
+        try {
+            $KerProviderFName = [IO.Path]::GetFileNameWithoutExtension($OutputFile) + "_kernelsession" `
+                + [IO.Path]::GetExtension($OutputFile)
+
+            $KernelFullPath = Join-Path (Split-Path $OutputFile) $KerProviderFName
+
+            "Writing kernel output to: " + $KernelFullPath
+            
+            Start-ETWKernelSession -OutputFile $KernelFullPath
+        } catch {
+            throw "Failed to start ETW kernel session"
+        }
     }
 
 } # Start-ETWForensicCollection

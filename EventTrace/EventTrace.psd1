@@ -18,6 +18,7 @@ FunctionsToExport = @(
     'New-ETWProviderOption',
     'Start-ETWForensicCollection',
     'Start-ETWSession',
+    'Start-ETWKernelSession',
     'Stop-ETWSession'
 
 )
