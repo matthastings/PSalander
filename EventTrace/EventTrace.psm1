@@ -292,13 +292,19 @@ Function Start-ETWSession
 
     Unique name describing the ETW session. This name will be visible from the Get-ETWSession function
 
+    .PARAMETER MaxFileSize
+
+    Max size of etl file before old events start being overwritten. 
+
+
     .EXAMPLE
 
-    Start-ETWSession -ProviderConfig $Config -OutputFile C:\test.etl -SessionName TestSession
+    Start-ETWSession -ProviderConfig $Config -OutputFile C:\test.etl -SessionName TestSession -MaxBufferSize 100
 
     Start an ETW session named "TestSession" and write events to the file "C:\test.etl".
     The ETW provider(s) name(s) and keywords are in the predefined variable "$Config.
     The $Config variable should be a single instance or array of objects created from the New-ETWProviderConfig function.
+    The output file will grow up to 50 MB before the oldest events are overwritten
 
     #>
 
@@ -314,7 +320,11 @@ Function Start-ETWSession
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutputFile
+        $OutputFile,
+
+        [Parameter(Mandatory=$false)]
+        [int]
+        $MaxFileSize = 50
     )
 
     BEGIN {
@@ -351,7 +361,8 @@ Function Start-ETWSession
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $path, $options)
         # Setting StopOnDispose to false will not end a session if powershell ends
         $session.StopOnDispose = $false
-
+        # Setting max file size
+        $session.CircularBufferMB = $MaxFileSize
 
         # Set log level. Default, and only supported option at this time, is Verbose
 
@@ -406,6 +417,10 @@ Function Start-ETWKernelSession
     
     Location on disk where Kernel ETW events will be written. Full path should be provided.
     
+    .PARAMETER MaxFileSize
+
+    Max size of etl file before old events start being overwritten. 
+
     .PARAMETER SessionName 
     
     Optional parameter to define a unique Kernel session name. On Win7 and 2008R2 this name has be to "NT Kernel Logger", which is the configured default value.
@@ -426,7 +441,11 @@ Function Start-ETWKernelSession
 
         [Parameter(Mandatory=$false)]
         [string]
-        $SessionName = [Microsoft.Diagnostics.Tracing.Parsers.KernelTraceEventParser]::KernelSessionName
+        $SessionName = [Microsoft.Diagnostics.Tracing.Parsers.KernelTraceEventParser]::KernelSessionName,
+
+        [Parameter(Mandatory=$false)]
+        [int]
+        $MaxFileSize = 50
     )
 
     # For kernel events we are mostly concerned with Process events
@@ -441,6 +460,10 @@ Function Start-ETWKernelSession
     $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, $path)
     
     $session.StopOnDispose = $false
+
+    # Setting max file size
+    $session.CircularBufferMB = $MaxFileSize
+    
     # Starts kernel session filtered to only collect process events
     $session.EnableKernelProvider($Process) 
 
@@ -564,8 +587,10 @@ Function Get-ETWEventLog
 
         Get-WinEvent -Path $KernelSessPath -Oldest |
             # Filter out any event that does not contain command line in eventpayload
-            Where-Object  { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -match "^80" } |
-            ForEach-Object { KernelSessionParser -EventPayload (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1] }
+            Where-Object  { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -notmatch "^00" } |
+            ForEach-Object { 
+                KernelSessionParser -EventPayload (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1] 
+            }
     }
 
     $Events.Values
