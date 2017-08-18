@@ -33,6 +33,24 @@ Function Test-IsProvider
 
 } # Test-IsProvider
 
+function Write-Log
+{
+	param (
+		[Parameter(Mandatory)]
+		[string]$Message,
+		
+		[Parameter()]
+		[ValidateSet('INFO','WARN','ERROR')]
+		[string]$Severity = 'INFO'
+	)
+	
+		$DateTime = ( Get-Date -UFormat "%D %T" )
+
+    '{0} {1}: {2}' -f $DateTime, $Severity, $Message
+    
+} # Write-Log
+
+
 # End private functions
 
 Function New-ETWProviderConfig
