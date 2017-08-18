@@ -31,7 +31,7 @@ function Get-KernelProcPath
                         $NullByte = $false
                     }
                 }
-        } While ($InString)
+        } While ($InString -and (($Start + $Length) -lt $HexString.length))
     }
     $CommandBytes = -join($HexString[$Start..($Start + $Length)] | 
         ForEach-Object { [char][convert]::ToUInt32($_, 16)  } |
@@ -60,7 +60,6 @@ function KernelSessionParser
 {
     param($EventPayload)
 
-    $t = $EventPayload
     # Convert string to byte array
     $EventPayload = $EventPayload |
         ForEach-Object { $_ -split '(..)' } |

@@ -566,6 +566,9 @@ Function Get-ETWEventLog
         $Path
     )
 
+    if (-not (Test-Path $path )) {
+        $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
+    }
     # Hash table mapping of supported ETW providers to parser functions
     $script:Providers = @{
     'Microsoft-Windows-Kernel-Process'  = 'KernelProcessParser'
@@ -582,7 +585,7 @@ Function Get-ETWEventLog
 
     # Check if kernel output exists
 
-    $KernelSessPath = -join([IO.Path]::GetFileNameWithoutExtension($Path) + "_kernelsession" + [IO.Path]::GetExtension($Path))
+    $KernelSessPath = -join([IO.Path]::GetDirectoryName($path) + '\' +  [IO.Path]::GetFileNameWithoutExtension($Path) + "_kernelsession" + [IO.Path]::GetExtension($Path))
     If ( Test-Path $KernelSessPath )  {
 
         Get-WinEvent -Path $KernelSessPath -Oldest |
