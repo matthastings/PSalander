@@ -40,13 +40,19 @@ function Write-Log
 		[string]$Message,
 		
 		[Parameter()]
-		[ValidateSet('INFO','WARN','ERROR')]
+		[ValidateSet('INFO','WARN', 'VERBOSE', 'DEBUG')]
 		[string]$Severity = 'INFO'
 	)
 	
-		$DateTime = ( Get-Date -UFormat "%D %T" )
+        $DateTime = ( Get-Date -UFormat "%D %T" )
+        
+        if ($Severity -eq 'INFO') { Write-Output ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
 
-    '{0} {1}: {2}' -f $DateTime, $Severity, $Message
+        if ($Severity -eq 'WARN') { Write-Warning ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
+
+        if ($Severity -eq 'VERBOSE') { Write-Verbose ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
+
+        if ($Severity -eq 'DEBUG') { Write-DEBUG ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
     
 } # Write-Log
 
