@@ -46,7 +46,7 @@ function Write-Log
 	
         $DateTime = ( Get-Date -UFormat "%D %T" )
         
-        if ($Severity -eq 'INFO') { Write-Output ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
+        if ($Severity -eq 'INFO') { Write-Host ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
 
         if ($Severity -eq 'WARN') { Write-Warning ('{0} {1}: {2}' -f $DateTime, $Severity, $Message) }
 
@@ -372,10 +372,9 @@ Function Start-ETWSession
             }
         }
 
-        Write-Verbose "Session name set to $SessionName"
-        Write-Verbose "Provider set to $ProviderName"
+        Write-Log "Session name set to $SessionName" -Severity "VERBOSE"
+        Write-Log "Provider set to $ProviderName" -Severity "VERBOSE"
         $path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
-        Write-Verbose "Setting output file to $path"
     }
     PROCESS {
         # Create our ETW Session options
@@ -411,16 +410,16 @@ Function Start-ETWSession
             }
 
             $result = $session.EnableProvider($ProviderID, $TraceEventLevel, $MatchAnyKeywords, $_.Options) 
+
         }
 
         # EnableProvider returns false if session if not previously exist
         If ( $result -eq $False ) {
-            Write-Verbose "Started session $SessionName"
+            Write-Log "Successfully started ETW session $SessionName" -Severity 'INFO'
         }
         else {
             throw "Failed to start session $SessionName"
         }
-        return $true
     }
 
 } # Start-ETWSession
@@ -489,7 +488,7 @@ Function Start-ETWKernelSession
     $session.CircularBufferMB = $MaxFileSize
     
     # Starts kernel session filtered to only collect process events
-    $session.EnableKernelProvider($Process) 
+    $result = $session.EnableKernelProvider($Process) 
 
 } # Start-ETWKernelSession
 
@@ -546,13 +545,25 @@ Function Stop-ETWSession {
         # Create ETW session
         $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($SessionName, "", $options)
         # Stop session
-        $session.stop()
+        $result = $session.stop()
+
+        if ($result) {
+            Write-Log "Successfully stopped ETW session $SessionName" -Severity 'INFO'
+        } else {
+            Write-Log "Failed to stop ETW session $SessionName" -Severity 'INFO'
+        }
 
         If ($StopKernelSession) {
             $KernelName = "NT Kernel Logger"
             $session = New-Object -TypeName Microsoft.Diagnostics.Tracing.Session.TraceEventSession -ArgumentList @($KernelName, "", $options)
             # Stop session
-            $session.stop()
+            $KerResult = $session.stop()
+
+            if ($KerResult) {
+            Write-Log "Successfully stopped kernel ETW session" -Severity 'INFO'
+        } else {
+            Write-Log "Failed to stop kernel ETW session" -Severity 'INFO'
+        }
         }
     }
 
@@ -602,7 +613,7 @@ Function Get-ETWEventLog
     }
 
     $Events = @{}
-
+    Write-Log "Found etw output file at: $path" -Severity 'INFO'
     Get-WinEvent -Path $Path -Oldest | Where-Object {
         $script:Providers.ContainsKey($_.ProviderName) } | ForEach-Object {
             &$script:Providers[$_.ProviderName] -Event $_ }
@@ -611,10 +622,9 @@ Function Get-ETWEventLog
 
     $KernelSessPath = -join([IO.Path]::GetDirectoryName($path) + '\' +  [IO.Path]::GetFileNameWithoutExtension($Path) + "_kernelsession" + [IO.Path]::GetExtension($Path))
     If ( Test-Path $KernelSessPath )  {
-
+        Write-Log "Found kernel session etw file at: $KernelSessPath" -Severity 'INFO'
         Get-WinEvent -Path $KernelSessPath -Oldest |
             # Filter out any event that does not contain command line in eventpayload
-            Where-Object  { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -notmatch "^00" } |
             ForEach-Object { 
                 KernelSessionParser -EventPayload (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1] 
             }
@@ -756,7 +766,8 @@ Function Start-ETWForensicCollection
 
     try 
     {
-        "Starting ETW forensic collection. Output will be written to: " + $OutputFile
+        Write-Log "Starting ETW forensic collection." -Severity 'INFO'
+        Write-Log "Output will be written to: $OutputFile" -Severity 'INFO'
 
         Start-ETWSession -SessionName $SessionName -OutputFile $OutputFile -ProviderConfig $ProviderConfigs
     } catch {
@@ -771,7 +782,7 @@ Function Start-ETWForensicCollection
 
             $KernelFullPath = Join-Path (Split-Path $OutputFile) $KerProviderFName
 
-            "Writing kernel output to: " + $KernelFullPath
+            Write-Log "Writing kernel output to: $KernelFullPath" -Severity 'INFO'
             
             Start-ETWKernelSession -OutputFile $KernelFullPath
         } catch {

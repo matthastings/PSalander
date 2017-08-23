@@ -46,6 +46,21 @@ function ThreadStart
 
         $Events.Add( $ProcID, $NewProcessObject )
     }
+
+    # Add image load to corresponding process thread
+    # Need to calculate image end address 
+    # $ImageEndAddr = ConvertTo-Hex ([uint64]$NewLoadImgObj.ImageBase + [uint64]$NewLoadImgObj.ImageSize)
+    $Events[$ProcId].LoadedImages |
+        # Verify loadedimage property does not already exist
+        # Where-Object { ($_.PSObject.Properties.Name -match 'LoadedImage').Count -lt 1 } | 
+        # Verify the thread start address is between the image load and end addresses
+        Where-Object { ( [uint64]$NewThread.Win32StartAddr -gt [uint64]$_.ImageBase) -and ([uint64]$NewThread.Win32StartAddr -lt [uint64](ConvertTo-Hex ([uint64]$_.ImageBase + [uint64]$_.ImageSize))) } |
+        ForEach-Object { 
+            $NewThread | Add-Member -NotePropertyName 'LoadedImage' -NotePropertyValue $_.ImageName 
+            $NewThread | Add-Member -NotePropertyName 'ImageBase' -NotePropertyValue $_.ImageBase            
+            $NewThread | Add-Member -NotePropertyName 'ImageSize' -NotePropertyValue $_.ImageSize
+        }
+
 } # ThreadStart
 
 
@@ -165,7 +180,6 @@ function ProcessStop
     param($Event)
     $ProcID = [int32]$Event.Properties[0].value
 
-    
 
     If ( $Events.ContainsKey( $ProcId ) ) {
 
@@ -193,7 +207,9 @@ function ProcessStop
         $NewProcessObject | Add-Member -NotePropertyName 'ReadTransferKiloBytes' -NotePropertyValue $Event.Properties[11].value
         $NewProcessObject | Add-Member -NotePropertyName 'WriteTransferKiloBytes' -NotePropertyValue $Event.Properties[12].value
 
-        $Events.Add( $ProcID, $NewProcessObject )
+        $UniqueKey = Get-Random
+        # Add new entry with random number as key
+        $Events.Add( [int32]$UniqueKey, $NewProcessObject )
     }
 }
 function KernelProcessParser
@@ -211,7 +227,7 @@ function KernelProcessParser
         2 = 'ProcessStop'
         3 = 'ThreadStart'
         4 = 'ThreadStop'
-        6 = 'ImageLoad'
+        5 = 'ImageLoad'
     }
 
     If ( $script:KernProcEvents.ContainsKey($Event.Id) ) {

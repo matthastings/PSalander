@@ -31,7 +31,8 @@ Here is an example event xml
 </Event>
 
 
-We are interested in the event payload. I've found the relevent messages always begin with "80". This filter seems to work:  Get-WinEvent -Path <path to file> -Oldest | ? { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -match "^80" }
+We are interested in the event payload. I've found the relevent messages always begin with "80". 
+This filter seems to work:  Get-WinEvent -Path <path to file> -Oldest | ? { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -match "^80" }
 
 Next we need to grab only the EventPayload xml node:  $a | % { (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1]  }
 

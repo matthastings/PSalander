@@ -60,19 +60,19 @@ function KernelSessionParser
 {
     param($EventPayload)
 
+    If ($EventPayload) { Write-Log $EventPayload -Severity "VERBOSE" }
+
     # Convert string to byte array
     $EventPayload = $EventPayload |
         ForEach-Object { $_ -split '(..)' } |
         Where-Object { $_ }
-        # ForEach-Object { [char][convert]::ToUInt32($_, 16) }
     try {
         $ProcID = [convert]::ToUInt32(-join($EventPayload[11..8]), 16)
     } catch {$ProcID = $null}        
     try { 
         $CommandLine = Get-KernelProcPath -HexString $EventPayload
     } catch {$CommandLine = $null}
-
-
+    
     If ( $ProcID -and $CommandLine ) {
         # Grab image name for comparison to events dictionary
        try {
@@ -90,4 +90,3 @@ function KernelSessionParser
             }
     }
 }
-
