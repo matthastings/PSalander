@@ -11,6 +11,15 @@ PSalander is a PowerShell project that enables users to easily interact with Eve
 
 ## Examples
 
+### List all ETW providers on a System
+
+```Get-ETWProvider```
+
+### List all active ETW sessions 
+
+```Get-ETWSessionNames```
+
+
 ### Starting Forensic Collection with PSalander
 INSERT EXAMPLES of starting and parsing etw providers
 
@@ -26,11 +35,6 @@ https://msdn.microsoft.com/en-us/library/windows/desktop/aa363668(v=vs.85).aspx
 https://github.com/Microsoft/perfview/blob/master/src/TraceEvent/TraceEventSession.cs
 https://blogs.technet.microsoft.com/office365security/hidden-treasure-intrusion-detection-with-etw-part-1/
 https://blogs.technet.microsoft.com/office365security/hidden-treasure-intrusion-detection-with-etw-part-2/
-
-## Requirements
- - Uses the Microsoft TraceEvent Library from https://www.nuget.org/packages/Microsoft.Diagnostics.Tracing.TraceEvent/ for ETW functions
- - .NET 4.0 or greater
- - PowerShell 3.0 or greater
 
 ## Referenced Work
 
