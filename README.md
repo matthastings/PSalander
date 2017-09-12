@@ -45,7 +45,7 @@ Get-ETWProviderKeywords -ProviderName $ProviderConfig.Name |
 
 ### Stop ETW Session
 
-```Stop-ETWSession -SessionName <previously provided unique session name>
+```Stop-ETWSession -SessionName <previously provided unique session name>```
 
 ### Parse any .ETL Log
 
