@@ -28,7 +28,7 @@ Warning: Enumerating session details has been found to stop certain ETW sessions
 ### Start Forensic Collection with PSWasp
 
 #### Create provider object 
-Note: This object defines the provider name or GUID, filtering keywords, or other filtering options
+Defines the provider name or GUID, filtering keywords, or other filtering options
 This example configures the `Micrsoft-Windows-Kernel-Process` provider and only enables the `Process`, `Image`, and `Thread` keywords
 ```
 $ProviderConfig = New-ETWProviderConfig
@@ -41,7 +41,7 @@ Get-ETWProviderKeywords -ProviderName $ProviderConfig.Name |
 
 #### Start ETW Session
 
-```Start-ETWSession -ProviderConfig $ProviderConfig -SessionName <unique session name> -OutputFile <path to write output etl file>```
+```Start-ETWSession -ProviderConfig $ProviderConfig -SessionName <unique session name> -OutputFile <path to etl file>```
 
 ### Stop ETW Session
 
@@ -51,8 +51,15 @@ Get-ETWProviderKeywords -ProviderName $ProviderConfig.Name |
 
 ```Get-WinEvent -Path <path to ETL file> -Oldest```
 
+### Start ETW forensic session with kernel session
+Kernel session is an optional argument that starts a unique kernel session. Enabling this session allows for the capture of process command line arguments.
+
+Note: Kernel session is enabled by default use `-DisableKernelProvider` to disable
+
+```Start-ETWForensicCollection -SessionName <unique session name> -OutputFile <path to etl file>```
+
 ### Parse .ETL file generated from Start-ETWForensicCollection
-Note: Will automatically identify and parse any kernel session output files from the same session
+Will automatically identify and parse any kernel session output files from the same session
 
 ```Get-ETWEventLog -Path <path to ETL file>```  
 
