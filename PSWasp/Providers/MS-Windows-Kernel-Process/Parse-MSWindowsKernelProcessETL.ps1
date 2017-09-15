@@ -49,10 +49,8 @@ function ThreadStart
 
     # Add image load to corresponding process thread
     # Need to calculate image end address 
-    # $ImageEndAddr = ConvertTo-Hex ([uint64]$NewLoadImgObj.ImageBase + [uint64]$NewLoadImgObj.ImageSize)
     $Events[$ProcId].LoadedImages |
         # Verify loadedimage property does not already exist
-        # Where-Object { ($_.PSObject.Properties.Name -match 'LoadedImage').Count -lt 1 } | 
         # Verify the thread start address is between the image load and end addresses
         Where-Object { ( [uint64]$NewThread.Win32StartAddr -gt [uint64]$_.ImageBase) -and ([uint64]$NewThread.Win32StartAddr -lt [uint64](ConvertTo-Hex ([uint64]$_.ImageBase + [uint64]$_.ImageSize))) } |
         ForEach-Object { 
@@ -76,10 +74,12 @@ function ThreadStop
         $Events[$ProcId].Threads |
             Where-Object {$_.ThreadID -eq $ThreadID} |
             ForEach-Object {
-                $_ | Add-Member -NotePropertyName 'ThreadEndTime' -NotePropertyValue $Event.TimeCreated
-                # The number of CPU clock cycles used by the thread. This value includes cycles spent in both user mode and kernel mode.
-                # Found at https://msdn.microsoft.com/en-us/library/windows/desktop/ms684943(v=vs.85).aspx
-                $_ | Add-Member -NotePropertyName 'CycleTime' -NotePropertyValue $Event.Properties[10].value 
+                If ( ($_.PSObject.Properties.Name -match 'ThreadEndTime').Count -lt 1 ) {
+                    $_ | Add-Member -NotePropertyName 'ThreadEndTime' -NotePropertyValue $Event.TimeCreated
+                    # The number of CPU clock cycles used by the thread. This value includes cycles spent in both user mode and kernel mode.
+                    # Found at https://msdn.microsoft.com/en-us/library/windows/desktop/ms684943(v=vs.85).aspx
+                    $_ | Add-Member -NotePropertyName 'CycleTime' -NotePropertyValue $Event.Properties[10].value
+                }
         }
      }
 } # ThreadStop
