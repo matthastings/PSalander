@@ -1,7 +1,7 @@
 Import-Module .\PSWasp
 Get-Module PSWasp | select -ExpandProperty ExportedCommands
-Get-ETWProvider | where name -match 'kernel-process$'
 Get-ETWProvider | select -ExpandProperty id | Group-Object | Measure-Object
+Get-ETWProvider | where name -match 'kernel-process$' | select *
 Get-ETWProvider | where name -match 'kernel-process$' | select -ExpandProperty Keywords
 Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, description
 Get-ETWSessionNames
