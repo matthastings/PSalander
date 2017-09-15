@@ -10,16 +10,16 @@ $EmpireSession = Import-Clixml demo\demo.xml
 $EmpireSession | Where Imagename -match "cscript" | gm -MemberType NoteProperty
 $EmpireSession | Where Imagename -match "cscript"
 $EmpireSession | Where Imagename -match "cscript" | Select -ExpandProperty ChildProcesses
-$EmpireSession | Where ProcessId -eq 3044
-$EmpireSession | Where ProcessId -eq 3044 | select -ExpandProperty FileIO
-$EmpireSession | Where ProcessId -eq 3044 | select -ExpandProperty NetConnections
-$EmpireSession | Where ProcessId -eq 3044 | select -ExpandProperty DomainLookups
-$EmpireSession | Where ProcessId -eq 3044 | select -ExpandProperty LoadedImages
-$EmpireSession | Where ProcessId -eq 3044 | select -ExpandProperty ChildProcesses
+$EmpireSession | Where ProcessId -eq 4988
+$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty FileIO
+$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty NetConnections
+$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty DomainLookups
+$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty LoadedImages
+$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty ChildProcesses
 $EmpireSession | Where DomainLookups -match "lets.popa.box"
-$EmpireSession | Where ProcessID -eq 1280
-$EmpireSession | Where ProcessID -eq 1280 | select -ExpandPropert ChildProcesses
-$EmpireSession | Where ProcessID -eq 1280 | select -ExpandPropert DomainLookups
-$EmpireSession | Where ProcessID -eq 1280 | select -ExpandPropert LoadedImages
-$EmpireSession | Where ProcessID -eq 1280 | select -ExpandPropert threads
-$EmpireSession | Where ProcessID -eq 1280 | % threads | where ThreadID -eq 5512
+$EmpireSession | Where ProcessID -eq 1944
+$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert ChildProcesses
+$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert DomainLookups
+$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert LoadedImages
+$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert threads
+$EmpireSession | Where ProcessID -eq 1944 | % threads | where ThreadID -eq 4120
