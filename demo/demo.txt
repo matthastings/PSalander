@@ -7,9 +7,12 @@ Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, de
 Get-ETWSessionNames
 Get-Module PSWasp | select -ExpandProperty ExportedCommands
 $EmpireSession = Import-Clixml demo\demo.xml
-$EmpireSession | Where Imagename -match "cscript" | gm -MemberType NoteProperty
+$EmpireSession | Where Imagename -match "certutil" | gm -MemberType NoteProperty
+$EmpireSession | Where Imagename -match "certutil"
+$EmpireSession | Where imagename -match "certutil" | select -ExpandProperty Domainlookups
+$EmpireSession | Where imagename -match "certutil" | select -ExpandProperty NetConnections
 $EmpireSession | Where Imagename -match "cscript"
-$EmpireSession | Where Imagename -match "cscript" | Select -ExpandProperty ChildProcesses
+$EmpireSession | Where Imagename -match "cscript" | select -ExpandProperty ChildProcesses
 $EmpireSession | Where ProcessId -eq 4988
 $EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty FileIO
 $EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty NetConnections
