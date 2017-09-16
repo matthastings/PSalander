@@ -610,6 +610,7 @@ Function Get-ETWEventLog
     'Microsoft-Windows-Kernel-Network'  = 'KernelNetworkParser'
     'Microsoft-Windows-Kernel-File'     = 'KernelFileParser'
     'Microsoft-Windows-DNS-Client'      = 'DNSClientParser'
+    'Microsoft-Windows-PowerShell'      = 'PowerShellParser'
     }
 
     $Events = @{}
@@ -707,6 +708,13 @@ Function Start-ETWForensicCollection
         ForEach-Object { $KernelProcessConfig.Keywords += $_ } 
 
     $ProviderConfigs += $KernelProcessConfig
+
+    # Build config for PowerShell events
+    $PowerShellName = "Microsoft-Windows-PowerShell"
+    $PowerShellConfig = New-ETWProviderConfig
+    $PowerShellConfig.name = $PowerShellName
+
+    $ProviderConfigs += $PowerShellConfig
 
     # Build config for network events
     $KernelNetworkName = 'Microsoft-Windows-Kernel-Network'
