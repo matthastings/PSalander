@@ -5,29 +5,34 @@ Get-ETWProvider | where name -match 'kernel-process$' | select *
 Get-ETWProvider | where name -match 'kernel-process$' | select -ExpandProperty Keywords
 Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, description
 Get-ETWSessionNames
-Get-Module PSWasp | select -ExpandProperty ExportedCommands
 $EmpireSession = Import-Clixml demo\demo.xml
-$EmpireSession | Where Imagename -match "powershell" | gm -MemberType NoteProperty
-$EmpireSession | Where Imagename -match "powershell"
-$EmpireSession | where ProcessID -eq 4700 | select -ExpandProperty ChildProcesses | select Commandline
-$EmpireSession | Where ProcessID -eq 4700
+$EmpireSession | Where Imagename -match "powershell" | select -First 1 | gm -MemberType NoteProperty | select Name
+cls
+$EmpireSession | where imagename -match "powershell" | select processid, imagename
+$EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty Commands
+$EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty ScriptBlocks
+cls
+$EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty ChildProcesses | select Commandline
 $EmpireSession | Where Imagename -match "certutil"
 $EmpireSession | Where imagename -match "certutil" | select -ExpandProperty Domainlookups
 $EmpireSession | Where imagename -match "certutil" | select -ExpandProperty NetConnections
 $EmpireSession | Where Imagename -match "runas"
-$EmpireSession | Where Imagename -match "runas" | select -ExpandProperty ChildProcesses | Select -ExpandProperty ChildProcesses
+$EmpireSession | Where Imagename -match "runas" | select -ExpandProperty ChildProcesses | select imagename
+$EmpireSession | Where Imagename -match "runas" | select -ExpandProperty ChildProcesses | select -ExpandProperty childprocesses | select commandline
+cls
+$EmpireSession | Where Imagename -match "notepad" | select -ExpandProperty FileIO
 $EmpireSession | Where Imagename -match "cscript"
-$EmpireSession | Where Imagename -match "cscript" | select -ExpandProperty ChildProcesses
-$EmpireSession | Where ProcessId -eq 4988
-$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty FileIO
-$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty NetConnections
-$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty DomainLookups
-$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty LoadedImages
-$EmpireSession | Where ProcessId -eq 4988 | select -ExpandProperty ChildProcesses
-$EmpireSession | Where DomainLookups -match "lets.popa.box"
-$EmpireSession | Where ProcessID -eq 1944
-$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert ChildProcesses
-$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert DomainLookups
-$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert LoadedImages
-$EmpireSession | Where ProcessID -eq 1944 | select -ExpandPropert threads
-$EmpireSession | Where ProcessID -eq 1944 | % threads | where ThreadID -eq 4120
+$EmpireSession | Where Imagename -match "cscript" | select -ExpandProperty ChildProcesses | select processid, imagename
+$EmpireSession | Where ProcessId -eq 6804
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty FileIO
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty NetConnections
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty DomainLookups
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty LoadedImages
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty ChildProcesses
+$EmpireSession | Where DomainLookups -match "lets.popa.box" | select processid, imagename
+$EmpireSession | Where ProcessID -eq 1924
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty ChildProcesses
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty DomainLookups
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty LoadedImages
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty threads
+$EmpireSession | Where ProcessID -eq 1924 | % threads | where ThreadID -eq 4120
