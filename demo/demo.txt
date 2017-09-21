@@ -9,7 +9,7 @@ $EmpireSession = Import-Clixml demo\demo.xml
 $EmpireSession | Where Imagename -match "powershell" | select -First 1 | gm -MemberType NoteProperty | select Name
 cls
 $EmpireSession | where imagename -match "powershell" | select processid, imagename
-$EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty Commands
+$EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty Commands -Unique
 $EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty ScriptBlocks
 cls
 $EmpireSession | where ProcessID -eq 5392 | select -ExpandProperty ChildProcesses | select Commandline
@@ -23,16 +23,20 @@ cls
 $EmpireSession | Where Imagename -match "notepad" | select -ExpandProperty FileIO
 $EmpireSession | Where Imagename -match "cscript"
 $EmpireSession | Where Imagename -match "cscript" | select -ExpandProperty ChildProcesses | select processid, imagename
-$EmpireSession | Where ProcessId -eq 6804
+$EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty Commandline
+$EmpireSession | where processid -eq 6804 | select -ExpandProperty commands -Unique
 $EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty FileIO
 $EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty NetConnections
 $EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty DomainLookups
 $EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty LoadedImages
 $EmpireSession | Where ProcessId -eq 6804 | select -ExpandProperty ChildProcesses
 $EmpireSession | Where DomainLookups -match "lets.popa.box" | select processid, imagename
-$EmpireSession | Where ProcessID -eq 1924
-$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty ChildProcesses
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty imagename, commandline
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty FileIO
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty ChildProcesses | select -ExpandProperty CommandLine
 $EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty DomainLookups
 $EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty LoadedImages
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty LoadedImages | where ImageName -match "automation"
+$EmpireSession | where processid -eq 1924 | select -ExpandProperty Commands -Unique
 $EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty threads
-$EmpireSession | Where ProcessID -eq 1924 | % threads | where ThreadID -eq 4120
+$EmpireSession | Where ProcessID -eq 1924 | select -ExpandProperty threads | where ThreadID -eq 6204
