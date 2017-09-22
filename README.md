@@ -60,7 +60,7 @@ Note: Kernel session is enabled by default use `-DisableKernelProvider` to disab
 ### Parse .ETL file generated from Start-ETWForensicCollection
 Will automatically identify and parse any kernel session output files from the same session
 
-```Get-ETWEventLog -Path <path to ETL file>```  
+```Get-ETWForensicEventLog -Path <path to ETL file>```  
 
 
 

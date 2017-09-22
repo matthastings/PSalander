@@ -569,7 +569,7 @@ Function Stop-ETWSession {
 
 } # Stop-ETWSession
 
-Function Get-ETWEventLog
+Function Get-ETWForensicEventLog
 {
     <#
     .SYNOPSIS
@@ -578,7 +578,7 @@ Function Get-ETWEventLog
 
     .DESCRIPTION
     
-    Get-ETWEventLog is a function tha parses an ETW event trace log for forensically significant information.
+    Get-ETWForensicEventLog is a function tha parses an ETW event trace log for forensically significant information.
     The raw log can be read using the builtin Get-WinEvent cmdlet. 
 
     .PARAMETER Path
@@ -587,7 +587,7 @@ Function Get-ETWEventLog
 
     .EXAMPLE
     
-    Get-ETWEventLog -Path C:\logs\process.etl
+    Get-ETWForensicEventLog -Path C:\logs\process.etl
 
     Converts process.etl for forensically significant ETW events for supported providers and returns objects representing the forenically signifant information. 
 
@@ -632,7 +632,7 @@ Function Get-ETWEventLog
     }
 
     $Events.Values
-} # Get-ETWEventLog
+} # Get-ETWForensicEventLog
 
 Function Start-ETWForensicCollection
 {

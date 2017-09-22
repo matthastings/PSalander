@@ -3,17 +3,20 @@ Get-Module PSWasp | select -Expand ExportedCommands
 Get-ETWProvider | select -Expand id | Group-Object | Measure-Object
 Get-ETWProvider | where name -match 'kernel-process$' | select *
 Get-ETWProvider | where name -match 'kernel-process$' | select -Expand Keywords
+cls
+Get-ETWProvider | where name -match 'kernel-process$' | select -Expand tasks
 Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, description
 Get-ETWSessionNames
 $EmpireSession = Import-Clixml demo\demo.xml
-$EmpireSession | Where Imagename -match "powershell" | select -First 1 | gm -MemberType NoteProperty | select Name
-cls
 $EmpireSession | where imagename -match "powershell" | select processid, imagename
+$EmpireSession | Where ProcessID -eq 5392 | gm -MemberType NoteProperty | select Name
+cls
 $EmpireSession | where ProcessID -eq 5392 | select -Expand Commands -Unique
-$EmpireSession | where processid -eq 1924 | select -expand scriptblocks | select-string "Get-GPPPassword"
+$EmpireSession | where processid -eq 5392 | select -expand scriptblocks | select-string "Get-GPPPassword"
 cls
 $EmpireSession | where ProcessID -eq 5392 | select -Expand ChildProcesses | select Commandline
 $EmpireSession | Where Imagename -match "certutil"
+cls
 $EmpireSession | Where imagename -match "certutil" | select -Expand Domainlookups
 $EmpireSession | Where imagename -match "certutil" | select -Expand NetConnections
 $EmpireSession | Where Imagename -match "runas"
@@ -24,7 +27,8 @@ $EmpireSession | Where Imagename -match "notepad" | select -Expand FileIO
 $EmpireSession | Where Imagename -match "cscript"
 $EmpireSession | Where Imagename -match "cscript" | select -Expand ChildProcesses | select processid, imagename
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand Commandline
-$EmpireSession | where processid -eq 6804 | select -Expand commands -Unique
+$EmpireSession | where processid -eq 6804 | select -Expand commands -Unique | sort
+$EmpireSession | where processid -eq 6804 | select -Expand scriptblocks | select-string "Invoke-Empire"
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand FileIO
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand DomainLookups
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand NetConnections
@@ -36,7 +40,7 @@ $EmpireSession | Where ProcessID -eq 1924 | select -Expand ChildProcesses | sele
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand DomainLookups
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages | where ImageName -match "automation"
-$EmpireSession | where processid -eq 1924 | select -Expand Commands -Unique$EmpireSession | Where ProcessID -eq 1924 | select -Expand threads
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand threads
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand threads | where ThreadID -eq 6204
 $EmpireSession | where processid -eq 1924 | select -Expand Commands -Unique
 $EmpireSession | where processid -eq 1924 | select -expand scriptblocks | select-string "Invoke-Mimikatz"
