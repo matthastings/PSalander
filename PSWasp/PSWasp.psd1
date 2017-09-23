@@ -10,6 +10,7 @@ Author = "Matt Hastings & Dave Hull"
 FunctionsToExport = @(
     'ConvertTo-ETWGuid',
     'Get-ETWForensicEventLog',
+    'Get-ETWForensicGraph',
     'Get-ETWProviderKeywords',
     'Get-ETWProvider',
     'New-ETWProviderConfig',

@@ -634,6 +634,119 @@ Function Get-ETWForensicEventLog
     $Events.Values
 } # Get-ETWForensicEventLog
 
+Function Get-ETWForensicGraph
+{
+    <#
+    .SYNOPSIS
+
+    Visualizes parent and child process relationships
+
+    .DESCRIPTION
+    
+    Get-ETWForensicGraph is a function that parses the output from Get-ETWForensicEventLog and visualizes parent and child relationships
+
+    .PARAMETER ETWObject
+    
+    Output from Get-ETWForensicEventLog
+
+    .PARAMETER ParentProcessID
+    
+    Starting process ID. Function will enumerate 5 layers of child processes from this starting point.
+
+    #>
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True)]
+        $ETWObject,
+
+        [Parameter(Mandatory=$True)]
+        $ParentProcessID
+    )
+    $ImageName = $ETWObject | Where-Object { $_.ProcessId -eq $ParentProcessID } | ForEach-Object {
+
+        If ($_.ImageName) {
+            $_.ImageName
+        } else {"Unknown"}
+    }
+
+    $ChildProcs = $ETWObject | Where-Object { $_.ProcessId -eq $ParentProcessID } | Select-Object -ExpandProperty ChildProcesses
+
+    $IMG = @"
+`t||
+`t||
+`t||
+
+"@
+    $2IMG = @"
+`t`t||
+`t`t||
+`t`t||
+
+"@
+
+    $3IMG = @"
+`t`t`t||
+`t`t`t||
+`t`t`t||
+
+"@
+
+    $4IMG = @"
+`t`t`t`t||
+`t`t`t`t||
+`t`t`t`t||
+
+"@
+
+    $5IMG = @"
+`t`t`t`t`t||
+`t`t`t`t`t||
+`t`t`t`t`t||
+
+"@
+
+    Write-Host `n`n$ImageName "($ParentProcessID)" -ForegroundColor Green
+    $IMG
+    $ChildProcs |
+        ForEach-Object {
+            $Proc = $_.ProcessID
+            Write-Host `t $_.ImageName "($Proc)" -ForegroundColor Green
+            If ($_.ChildProcesses) {
+                $2IMG
+                $_.ChildProcesses | ForEach-Object {
+                    $Proc = $_.ProcessId
+                    Write-Host `t`t $_.ImageName "($Proc)" -ForegroundColor Green
+
+                    If ($_.ChildProcesses) {
+                        $3IMG
+                        $_.ChildProcesses | ForEach-Object {
+                            $Proc = $_.ProcessID
+                            Write-Host `t`t`t $_.ImageName "($Proc)" -ForegroundColor Green
+                            
+                            If ($_.ChildProcesses) {
+                                $4IMG
+                                $_.ChildProcesses | ForEach-Object {
+                                    $Proc = $_.ProcessID
+                                    Write-Host `t`t`t`t $_.ImageName "($Proc)" -ForegroundColor Green
+                                    
+                                    If ($_.ChildProcesses) {
+                                        $5IMG
+                                        $_.ChildProcesses | ForEach-Object {
+                                            $Proc = $_.ProcessID
+                                            Write-Host `t`t`t`t`t $_.ImageName "($Proc)" -ForegroundColor Green
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+}
 Function Start-ETWForensicCollection
 {
     <#

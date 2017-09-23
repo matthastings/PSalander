@@ -29,18 +29,28 @@ $EmpireSession | Where Imagename -match "cscript" | select -Expand ChildProcesse
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand Commandline
 $EmpireSession | where processid -eq 6804 | select -Expand commands -Unique | sort
 $EmpireSession | where processid -eq 6804 | select -Expand scriptblocks | select-string "Invoke-Empire"
+cls
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand FileIO
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand DomainLookups
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand NetConnections
+$EmpireSession | where processid -eq 6804 | select ReadTransferKiloBytes, WriteTransferKiloBytes
 $EmpireSession | Where ProcessId -eq 6804 | select -Expand LoadedImages
+cls
 $EmpireSession | Where DomainLookups -match "lets.popa.box" | select processid, imagename
 $EmpireSession | Where ProcessID -eq 1924 | select imagename, commandline
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand FileIO
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand ChildProcesses | select -Expand CommandLine
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand DomainLookups
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages
+cls
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages | where ImageName -match "automation"
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand threads
+cls
 $EmpireSession | Where ProcessID -eq 1924 | select -Expand threads | where ThreadID -eq 6204
 $EmpireSession | where processid -eq 1924 | select -Expand Commands -Unique
-$EmpireSession | where processid -eq 1924 | select -expand scriptblocks | select-string "Invoke-Mimikatz"
+$MimiKaz = $EmpireSession | where processid -eq 1924 | select -expand scriptblocks
+$MimiKaz[7].Substring(0,800)
+cls
+Get-ETWForensicGraph -ETWObject $EmpireSession -ParentProcessID 1924
+cls
+Get-ETWForensicGraph -ETWObject $EmpireSession -ParentProcessID 5392
