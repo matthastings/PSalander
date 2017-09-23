@@ -1,6 +1,0 @@
-+ Identify interesting DNS Events
-    + 25 events see Monitored-DNS-Events
-- Determine best way to represent them
-    - As objects? Each event it's own object? Get-WinEvent already returns
-    objects, we just need code that can pull the properties we want from those
-    objects.
