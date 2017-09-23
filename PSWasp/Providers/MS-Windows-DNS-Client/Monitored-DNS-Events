@@ -1,0 +1,25 @@
+1002 The DNS server being queried for interface %1 has changed to %3                         
+1026 The question (%2) in the response from server %4 does not match the original question %1                         
+3000 DNS Query is initiated for the name %1 and for the type %2 with query options %3                                 
+3001 DNS Query operation is completed with result %1                                                                  
+3002 DNS Cache lookup is initiated for the name %1 and for the type %2 with query options %3                          
+3003 DNS Cache lookup operation for the name %1 and for the type %2 is completed with result %3                       
+3004 DNS FQDN Query is initiated for the name %1 and for the type %2 with query options %3                            
+3005 DNS FQDN Query operation for the name %1 and for the type %2 is completed with result %3                         
+3006 DNS query is called for the name %1, type %2, query options %3, Server List %4, isNetwork query %5, network      
+     index %6, interface index %7, is asynchronous query %8                                                           
+3007 DnsQueryEx for the name %1 is pending                                                                            
+3008 DNS query is completed for the name %1, type %2, query options %3 with status %4 Results %5                      
+3009 Network query initiated for the name %1 (is parallel query %2) on network index %3 with interface count %4 with  
+     first interface name %5, local addresses %6 and Dns Servers %7                                                   
+3010 DNS Query sent to DNS Server %3 for name %1 and type %2                                                          
+3011 Received response from DNS Server %3 for name %1 and type %2 with response status %4                             
+3012 NETBIOS query is initiated for name %1 on network index %2 with inteface count %3 with first interface name %4   
+     and local addresses %5                                                                                           
+3013 NETBIOS query is completed for name %1 with status %2 and results %3                                             
+3014 NETBIOS query for the name %1 is pending                                                                         
+3015 DnsQueryEx is canceled for the name %1                                                                           
+3016 Cache lookup called for name %1, type %2, options %3 and interface index %4                                      
+3018 Cache lookup for name %1, type %2 and option %3 returned %4 with results %5                                      
+3019 Query wire called for name %1, type %2, interface index %3 and network index %4                                  
+3020 Query response for name %1, type %2, interface index %3 and network index %4 returned %5 with results %6                            

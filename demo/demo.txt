@@ -1,0 +1,56 @@
+Import-Module .\PSWasp
+Get-Module PSWasp | select -Expand ExportedCommands
+Get-ETWProvider | select -Expand id | Group-Object | Measure-Object
+Get-ETWProvider | where name -match 'kernel-process$' | select *
+Get-ETWProvider | where name -match 'kernel-process$' | select -Expand Keywords
+cls
+Get-ETWProvider | where name -match 'kernel-process$' | select -Expand tasks
+Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, description
+Get-ETWSessionNames
+$EmpireSession = Import-Clixml demo\demo.xml
+$EmpireSession | where imagename -match "powershell" | select processid, imagename
+$EmpireSession | Where ProcessID -eq 5392 | gm -MemberType NoteProperty | select Name
+cls
+$EmpireSession | where ProcessID -eq 5392 | select -Expand Commands -Unique
+$EmpireSession | where processid -eq 5392 | select -expand scriptblocks | select-string "Get-GPPPassword"
+cls
+$EmpireSession | where ProcessID -eq 5392 | select -Expand ChildProcesses | select Commandline
+$EmpireSession | Where Imagename -match "certutil"
+cls
+$EmpireSession | Where imagename -match "certutil" | select -Expand Domainlookups
+$EmpireSession | Where imagename -match "certutil" | select -Expand NetConnections
+$EmpireSession | Where Imagename -match "runas"
+$EmpireSession | Where Imagename -match "runas" | select -Expand ChildProcesses | select imagename
+$EmpireSession | Where Imagename -match "runas" | select -Expand ChildProcesses | select -Expand childprocesses | select commandline
+cls
+$EmpireSession | Where Imagename -match "notepad" | select -Expand FileIO
+$EmpireSession | Where Imagename -match "cscript"
+$EmpireSession | Where Imagename -match "cscript" | select -Expand ChildProcesses | select processid, imagename
+$EmpireSession | Where ProcessId -eq 6804 | select -Expand Commandline
+$EmpireSession | where processid -eq 6804 | select -Expand commands -Unique | sort
+$EmpireSession | where processid -eq 6804 | select -Expand scriptblocks | select-string "Invoke-Empire"
+cls
+$EmpireSession | Where ProcessId -eq 6804 | select -Expand FileIO
+$EmpireSession | Where ProcessId -eq 6804 | select -Expand DomainLookups
+$EmpireSession | Where ProcessId -eq 6804 | select -Expand NetConnections
+$EmpireSession | where processid -eq 6804 | select ReadTransferKiloBytes, WriteTransferKiloBytes
+$EmpireSession | Where ProcessId -eq 6804 | select -Expand LoadedImages
+cls
+$EmpireSession | Where DomainLookups -match "lets.popa.box" | select processid, imagename
+$EmpireSession | Where ProcessID -eq 1924 | select imagename, commandline
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand FileIO
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand ChildProcesses | select -Expand CommandLine
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand DomainLookups
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages
+cls
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand LoadedImages | where ImageName -match "automation"
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand threads
+cls
+$EmpireSession | Where ProcessID -eq 1924 | select -Expand threads | where ThreadID -eq 6204
+$EmpireSession | where processid -eq 1924 | select -Expand Commands -Unique
+$MimiKaz = $EmpireSession | where processid -eq 1924 | select -expand scriptblocks
+$MimiKaz[7].Substring(0,800)
+cls
+Get-ETWForensicGraph -ETWObject $EmpireSession -ParentProcessID 1924
+cls
+Get-ETWForensicGraph -ETWObject $EmpireSession -ParentProcessID 5392

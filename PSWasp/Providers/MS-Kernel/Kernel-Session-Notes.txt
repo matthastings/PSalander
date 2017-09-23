@@ -1,0 +1,62 @@
+ETW Kernel Session Event messages are not properly parsed by Get-WinEvent becuase the cmdlet does not have the correct xml format file
+
+Therefore we have to parse relevant event properties using PowerShell structure parsing.
+
+The first task is taking Get-WinEvent output and filtering it down to only return events with properties that contain the process command line
+
+Here is an example event xml
+
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+        <Provider Name="" Guid="{3d6fa8d0-fe05-11d0-9dda-00c04fd7ba7c}" />
+        <EventID>0</EventID>
+        <Version>4</Version>
+        <Level>0</Level>
+        <Task>0</Task>
+        <Opcode>2</Opcode>
+        <Keywords>0x0</Keywords>
+        <TimeCreated SystemTime="2017-08-11T19:58:42.695093000Z" />
+        <EventRecordID>2505</EventRecordID>
+        <Correlation />
+        <Execution ProcessID="11068" ThreadID="4056" ProcessorID="6" KernelTime="0" UserTime="0" />
+        <Channel></Channel>
+        <Computer>office-pc</Computer>
+        <Security />
+    </System>
+    <ProcessingErrorData>
+        <ErrorCode>15003</ErrorCode>
+        <DataItemName></DataItemName>
+        <EventPayload>80403A9D859FFFFF3C2B0000700300000100000001000000001049C10000000009000000A03CAC4007B0FFFF00000000000000000105000000000005150000007E92A50F78D99D9072051408E903000048785473722E65786500220043003A005C00500072006F006700720061006D002000460069006C00650073005C00570069006E0064006F007700730041007000700073005C006D006900630072006F0073006F00660074002E00770069006E0064006F007700730063006F006D006D0075006E00690063006100740069006F006E00730061007000700073005F00310037002E0038003400300030002E00340030003700340035002E0030005F007800360034005F005F003800770065006B007900620033006400380062006200770065005C00480078005400730072002E00650078006500220020002D005300650072007600650072004E0061006D0065003A00480078002E004900500043002E0053006500720076006500720000006D006900630072006F0073006F00660074002E00770069006E0064006F007700730063006F006D006D0075006E00690063006100740069006F006E00730061007000700073005F00310037002E0038003400300030002E00340030003700340035002E0030005F007800360034005F005F003800770065006B007900620033006400380062006200770065000000700070006C006500610065003300380061006600320065003000300037006600340033003500380061003800300039006100630039003900610036003400610036003700630031000000</EventPayload>
+    </ProcessingErrorData>
+</Event>
+
+
+We are interested in the event payload. I've found the relevent messages always begin with "80". 
+This filter seems to work:  Get-WinEvent -Path <path to file> -Oldest | ? { ([xml]$_.toxml()).Event.ChildNodes.EventPayload -match "^80" }
+
+Next we need to grab only the EventPayload xml node:  $a | % { (([xml]$_.toxml()).Event.ChildNodes.EventPayload)[1]  }
+
+Convert string to hex string: -split '(..)' | ? {$_} | % {[char][convert]::ToUInt32($_,16)}
+
+Once we have the relevant events we need to parse out two properties: Process ID and Process Command Line 
+
+Process ID is stored as a UInt32 at offset 0x08
+
+[bitconverter]::toint16($u[8..12], 0)
+
+ProcessCommandLine is a bit trickier. The ImageName is the first variable string the moves immediately to the commandline in the message and always starts at offset 0x40 and should be read until a double null byte (0x00 0x00) terminates the string
+
+Start = 64
+#end = $array.length
+Length = 0
+$NullByte = $false
+
+For Each
+
+$u[$start..$u.length] |
+    ForEach-Object {
+        If ($NullByte -and ([uint16]$_ -eq 0)) {
+            break
+        }
+        Elseif
+    }

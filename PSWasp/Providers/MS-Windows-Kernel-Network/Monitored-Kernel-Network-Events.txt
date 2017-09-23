@@ -1,0 +1,73 @@
+Get-ETWProvider  | Where-Object { $_.Name -eq 'Microsoft-Windows-Kernel-Network'} | % { $_.Events } | select id,description | ft -Wrap -Property Id,Description 
+
+Id Description                                                                                 
+-- -----------                                                                                 
+10 TCPv4: %2 bytes transmitted from %4:%6 to %3:%5.                                            
+11 TCPv4: %2 bytes received from %4:%6 to %3:%5.                                               
+12 TCPv4: Connection attempted between %4:%6 and %3:%5.                                        
+13 TCPv4: Connection closed between %4:%6 and %3:%5.                                           
+14 TCPv4: %2 bytes retransmitted from %4:%6 to %3:%5.                                          
+15 TCPv4: Connection established between %4:%6 and %3:%5.                                      
+16 TCPv4: Reconnect attempt between %4:%6 and %3:%5.                                           
+17 TCPv4: Connection attempt failed with error code %2.                                        
+18 TCPv4: %2 bytes copied in protocol on behalf of user for connection between %4:%6 and %3:%5.
+26 TCPv6: %2 bytes transmitted from %4:%6 to %3:%5.                                            
+27 TCPv6: %2 bytes received from %4:%6 to %3:%5.                                               
+28 TCPv6: Connection attempted between %4:%6 and %3:%5.                                        
+29 TCPv6: Connection closed between %4:%6 and %3:%5.                                           
+30 TCPv6: %2 bytes retransmitted from %4:%6 to %3:%5.                                          
+31 TCPv6: Connection established between %4:%6 and %3:%5.                                      
+32 TCPv6: Reconnect attempt between %4:%6 and %3:%5.                                           
+34 TCPv6: %2 bytes copied in protocol on behalf of user for connection between %4:%6 and %3:%5.
+42 UDPv4: %2 bytes transmitted from %4:%6 to %3:%5.                                            
+43 UDPv4: %2 bytes received from %4:%6 to %3:%5.                                               
+49 UDPv4: Connection attempt failed with error code %2.                                        
+58 UDPv6: %2 bytes transmitted from %4:%6 to %3:%5.                                            
+59 UDPv6: %2 bytes received from %4:%6 to %3:%5.                                               
+
+
+Get-ETWProviderKeywords -ProviderName Microsoft-Windows-Kernel-Network
+
+
+Name                                      Description               Value
+----                                      -----------               -----
+KERNEL_NETWORK_KEYWORD_IPV4                                           16
+KERNEL_NETWORK_KEYWORD_IPV6                                           32
+Microsoft-Windows-Kernel-Network/Analytic            9223372036854775808
+
+Event Log xml
+
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+        <Provider Name="Microsoft-Windows-Kernel-Network" Guid="{7dd42a49-5329-4832-8dfd-43d979153a88}" />
+        <EventID>12</EventID>
+        <Version>0</Version>
+        <Level>4</Level>
+        <Task>10</Task>
+        <Opcode>12</Opcode>
+        <Keywords>0x8000000000000010</Keywords>
+        <TimeCreated SystemTime="2017-06-09T23:42:28.277200000Z" />
+        <EventRecordID>0</EventRecordID>
+        <Correlation />
+        <Execution ProcessID="4" ThreadID="300" ProcessorID="0" KernelTime="1661" UserTime="0" />
+        <Channel></Channel>
+        <Computer>office-pc</Computer>
+        <Security />
+    </System>
+    <EventData>
+        <Data Name="PID">2456</Data>
+        <Data Name="size">0</Data>
+        <Data Name="daddr">1142973847</Data>
+        <Data Name="saddr">3388997642</Data>
+        <Data Name="dport">20480</Data>
+        <Data Name="sport">11985</Data>
+        <Data Name="mss">1396</Data>
+        <Data Name="sackopt">1</Data>
+        <Data Name="tsopt">0</Data>
+        <Data Name="wsopt">1</Data>
+        <Data Name="rcvwin">65612</Data>
+        <Data Name="rcvwinscale">8</Data>
+        <Data Name="sndwinscale">9</Data>
+        <Data Name="seqnum">0</Data>
+        <Data Name="connid">0</Data>
+    </EventData>4
