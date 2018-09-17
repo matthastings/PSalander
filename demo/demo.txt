@@ -1,12 +1,5 @@
 Import-Module .\PSWasp
 Get-Module PSWasp | select -Expand ExportedCommands
-Get-ETWProvider | select -Expand id | Group-Object | Measure-Object
-Get-ETWProvider | where name -match 'kernel-process$' | select *
-Get-ETWProvider | where name -match 'kernel-process$' | select -Expand Keywords
-cls
-Get-ETWProvider | where name -match 'kernel-process$' | select -Expand tasks
-Get-ETWProvider | where name -match 'kernel-process$' | % Events | select id, description
-Get-ETWSessionNames
 $EmpireSession = Import-Clixml demo\demo.xml
 $EmpireSession | where imagename -match "powershell" | select processid, imagename
 $EmpireSession | Where ProcessID -eq 5392 | gm -MemberType NoteProperty | select Name
